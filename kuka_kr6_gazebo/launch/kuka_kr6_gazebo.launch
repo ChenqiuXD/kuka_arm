@@ -1,0 +1,32 @@
+<launch>
+  <!-- remap topics to conform to ROS-I specifications -->
+  <remap from="/arm_controller/follow_joint_trajectory" to="/joint_trajectory_action" />
+  <remap from="/arm_controller/state" to="/feedback_states" />
+  <remap from="/arm_controller/command" to="/joint_path_command"/>
+
+  <!-- these are the arguments you can pass this launch file, for example paused:=true -->
+  <arg name="paused" default="false"/>
+  <arg name="use_sim_time" default="true"/>
+  <arg name="gui" default="true"/>
+  <arg name="headless" default="false"/>
+  <arg name="debug" default="false"/>
+
+  <!-- We resume the logic in empty_world.launch, changing only the name of the world to be launched -->
+  <include file="$(find gazebo_ros)/launch/empty_world.launch">
+    <arg name="world_name" value="${find kuka_kr6_gazebo}/worlds/kuka_arm_world.world"/>
+    <!--<arg name="world_name" value="empty_world.world"/>-->
+    <arg name="debug" value="$(arg debug)" />
+    <arg name="gui" value="$(arg gui)" />
+    <arg name="paused" value="$(arg paused)"/>
+    <arg name="use_sim_time" value="$(arg use_sim_time)"/>
+    <arg name="headless" value="$(arg headless)"/>
+  </include>
+
+
+  <!-- Convert an xacro and put on parameter server -->
+  <param name="robot_description" command="$(find xacro)/xacro --inorder '$(find kuka_kr6_description)/urdf/kuka_arm.xacro'" />
+
+  <!-- Spawn a robot into Gazebo -->
+  <node name="spawn_urdf" pkg="gazebo_ros" type="spawn_model" output="screen" args="-param robot_description -urdf -model kuka_arm" />
+
+</launch>

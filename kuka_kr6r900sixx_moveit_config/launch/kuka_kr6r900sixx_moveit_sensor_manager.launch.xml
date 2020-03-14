@@ -1,0 +1,13 @@
+<launch>
+
+  <!--# This file makes it easy to include the settings for sensor managers 
+
+  # Sensor configuration files-->
+  <rosparam command="load" file="$(find kuka_kr6r900sixx_moveit_config)/config/sensor_kinect.yaml" />
+
+  <!--# Params for the octomap monitor-->
+  <param name="octomap_frame" type="string" value="map" />
+  <param name="octomap_resolution" type="double" value="0.025" />
+  <param name="max_range" type="double" value="5.0" />
+ 
+</launch>

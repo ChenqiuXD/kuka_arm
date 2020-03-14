@@ -1,0 +1,26 @@
+<launch>
+  <!--# The planning and execution components of MoveIt! configured to 
+  # publish the current configuration of the robot (simulated or real) 
+  # and the current state of the world as seen by the planner-->
+  <include file="$(find kuka_kr6r900sixx_moveit_config)/launch/move_group.launch">
+    <arg name="publish_monitored_planning_scene" value="true" />
+  </include>
+
+  <!-- Load the URDF, SRDF and other .yaml configuration files on the param server -->
+  <include file="$(find kuka_kr6r900sixx_moveit_config)/launch/planning_context.launch">
+    <arg name="load_robot_description" value="false"/>
+  </include>
+
+  <!--# The visualization component of MoveIt!-->
+  <include file="$(find kuka_kr6r900sixx_moveit_config)/launch/moveit_rviz.launch"/>
+
+  <!-- We do not have a robot connected, so publish fake joint states -->
+  <node name="joint_state_publisher" pkg="joint_state_publisher" type="joint_state_publisher">
+    <param name="/use_gui" value="false"/>
+    <rosparam param="/source_list">[/move_group/fake_controller_joint_states]</rosparam>
+  </node>
+  
+  <!-- Load the controller by kuka_arm_control-->
+  <include file="$(find kuka_kr6_control)/launch/kuka_kr6_control.launch"/>
+
+</launch>
