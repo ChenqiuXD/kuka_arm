@@ -1,0 +1,26 @@
+<?xml version="1.0" ?>
+<sdf version="1.4">
+  <world name="default">
+    <include>
+      <uri>model://ground_plane</uri>
+    </include>
+    <include>
+      <uri>model://sun</uri>
+    </include>
+    <include>
+      <uri>model://kuka_kr6_gazebo/models/cafe_table</uri>
+      <name>cafe_table</name>
+      <pose>0.65 0 -0.5 0 0 0</pose>
+    </include>
+    <include>
+      <uri>model://kuka_kr6_gazebo/models/wooden_case_modi</uri>
+      <name>wooden_case</name>
+      <pose>1.0 0 0.36 0 -1.57 0</pose>
+    </include>
+    <include>
+      <uri>model://kuka_kr6_gazebo/models/unit_box</uri>
+      <name>box</name>
+      <pose>0.58 0.115 0.3 0 0 -0.2617</pose>
+    </include>
+  </world>
+</sdf>

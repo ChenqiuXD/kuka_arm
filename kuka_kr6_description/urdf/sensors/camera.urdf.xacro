@@ -5,7 +5,7 @@
   <xacro:property name="CAM_RADIUS" value="0.05" />
 
    <joint name="camera_joint" type="fixed">
-        <origin xyz="1.5 0 1.0" rpy="${PI} ${5*PI/6} 0"/>
+        <origin xyz="1.15 0 0.7" rpy="${PI} ${3/4*PI} 0"/>
         <parent link="base_link"/>
         <child link="camera_link"/>
    </joint>
@@ -30,9 +30,10 @@
     <visual>
       <origin xyz="0 0 0" rpy="0 0 0"/>
       <geometry>
-        <cylinder length="${CAM_LEN}" radius="${CAM_RADIUS}"/> 
+        <!--<cylinder length="${CAM_LEN}" radius="${CAM_RADIUS}"/> -->
+        <mesh filename="package://kuka_kr6_description/meshes/camera/kinect.dae"/>
       </geometry>
-      <material name="red"/>
+      <material name="black"/>
     </visual>
 
     <sensor name="camera" type="depth">

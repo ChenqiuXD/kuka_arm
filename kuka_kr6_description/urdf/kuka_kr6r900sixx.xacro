@@ -126,8 +126,17 @@
             </geometry>
         </collision>
     </link>
+
     <!-- This frame corresponds to the $FLANGE coordinate system in KUKA KRC controllers. -->
-    <link name="tool0"/>
+    <link name="tool0">
+        <xacro:default_inertial mass = '0.000000001'/>
+        <visual>
+            <origin xyz = '0 0 0.05' rpy = '0 0 0'/>
+            <geometry>
+                <box size = "0.08 0.08 0.08" />
+            </geometry>
+        </visual>
+    </link>
 
 
     <!--############################################################################################-->

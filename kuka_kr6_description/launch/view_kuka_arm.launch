@@ -1,7 +1,7 @@
 <launch>
     <arg name="model" />
     <param name="robot_description" command="$(find xacro)/xacro --inorder $(find kuka_kr6_description)/urdf/kuka_arm.xacro" />
-    <param name="use_gui" value="true"/>
+    <param name="use_gui" value="false"/>
 
     <node name="joint_state_publisher" pkg="joint_state_publisher" type="joint_state_publisher" />
     
@@ -9,5 +9,6 @@
     <node name="robot_state_publisher" pkg="robot_state_publisher" type="state_publisher" />
 
     <!--run rviz visualization-->
-    <node name="rviz" pkg="rviz" type="rviz"  />
+    <node name="rviz" pkg="rviz" type="rviz" args="-d $(find kuka_kr6_description)/config/view_kuka_arm.rviz"/>
+    <!--<node name="rviz" pkg="rviz" type="rviz"/>-->
 </launch>

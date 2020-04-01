@@ -12,6 +12,5 @@ To visulaize the image obtained from kinect, run
 rosrun image_view image_view image:='camera/color/image_raw'
 
 ## TODO
-Add Aruco tag onto target grasp object.
-Use opencv to obtain the position of target object by detecting Aruco tag.
+Use some algorithm to get the position of the target object
 Learn about the grasp interface of moveit.
