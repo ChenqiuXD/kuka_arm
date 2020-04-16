@@ -1,4 +1,6 @@
 <launch>
+  <arg name="use_gui" default="false"/>
+
   <!--# The planning and execution components of MoveIt! configured to 
   # publish the current configuration of the robot (simulated or real) 
   # and the current state of the world as seen by the planner-->
@@ -16,7 +18,8 @@
 
   <!-- We do not have a robot connected, so publish fake joint states -->
   <node name="joint_state_publisher" pkg="joint_state_publisher" type="joint_state_publisher">
-    <param name="/use_gui" value="false"/>
+    <param name="/use_gui" value="$(arg use_gui)"/>
+    <param name="/use_sim_time" value="true"/>
     <rosparam param="/source_list">[/move_group/fake_controller_joint_states]</rosparam>
   </node>
   

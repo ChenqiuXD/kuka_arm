@@ -13,3 +13,10 @@ kuka_kr6:
       - joint_a4
       - joint_a5
       - joint_a6
+    gains:
+      joint_a1: {p: 100, d: 0.1, i: 1}
+      joint_a2: {p: 100, d: 0.1, i: 1}
+      joint_a3: {p: 100, d: 0.1, i: 1}
+      joint_a4: {p: 100, d: 0.1, i: 1}
+      joint_a5: {p: 100, d: 0.1, i: 1}
+      joint_a6: {p: 100, d: 0.1, i: 1}

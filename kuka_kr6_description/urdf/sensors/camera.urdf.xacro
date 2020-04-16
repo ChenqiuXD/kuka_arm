@@ -53,5 +53,12 @@
     </sensor>
   </link>
 
+   <joint name="camera_joint_vision" type="fixed">
+        <origin xyz="0 0 0" rpy="${-PI/2} 0 ${-PI/2}"/>
+        <parent link="camera_link"/>
+        <child link="camera_vision_link"/>
+   </joint>
+  <link name="camera_vision_link" />
+
   <xacro:include filename="$(find kuka_kr6_description)/urdf/sensors/camera.gazebo.xacro"/>
 </robot>

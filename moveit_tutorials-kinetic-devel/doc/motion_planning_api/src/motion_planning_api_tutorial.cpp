@@ -70,7 +70,7 @@ int main(int argc, char** argv)
   //
   // .. _RobotModelLoader:
   //     http://docs.ros.org/indigo/api/moveit_ros_planning/html/classrobot__model__loader_1_1RobotModelLoader.html
-  const std::string PLANNING_GROUP = "panda_arm";
+  const std::string PLANNING_GROUP = "manipulator";
   robot_model_loader::RobotModelLoader robot_model_loader("robot_description");
   robot_model::RobotModelPtr robot_model = robot_model_loader.getModel();
   /* Create a RobotState and JointModelGroup to keep track of the current robot pose and planning group*/
@@ -82,7 +82,7 @@ int main(int argc, char** argv)
   planning_scene::PlanningScenePtr planning_scene(new planning_scene::PlanningScene(robot_model));
 
   // Configure a valid robot state
-  planning_scene->getCurrentStateNonConst().setToDefaultValues(joint_model_group, "ready");
+  // planning_scene->getCurrentStateNonConst().setToDefaultValues(joint_model_group, "ready");
 
   // We will now construct a loader to load a planner, by name.
   // Note that we are using the ROS pluginlib library here.
@@ -159,7 +159,7 @@ int main(int argc, char** argv)
   pose.header.frame_id = "panda_link0";
   pose.pose.position.x = 0.3;
   pose.pose.position.y = 0.4;
-  pose.pose.position.z = 0.75;
+  pose.pose.position.z = 0.5;
   pose.pose.orientation.w = 1.0;
 
   // A tolerance of 0.01 m is specified in position
@@ -175,7 +175,7 @@ int main(int argc, char** argv)
   // .. _kinematic_constraints:
   //     http://docs.ros.org/indigo/api/moveit_core/html/namespacekinematic__constraints.html#a88becba14be9ced36fefc7980271e132
   moveit_msgs::Constraints pose_goal =
-      kinematic_constraints::constructGoalConstraints("panda_link8", pose, tolerance_pose, tolerance_angle);
+      kinematic_constraints::constructGoalConstraints("tool0", pose, tolerance_pose, tolerance_angle);
 
   req.group_name = PLANNING_GROUP;
   req.goal_constraints.push_back(pose_goal);
@@ -225,7 +225,7 @@ int main(int argc, char** argv)
   // ^^^^^^^^^^^^^^^^^
   // Now, setup a joint space goal
   robot_state::RobotState goal_state(robot_model);
-  std::vector<double> joint_values = { -1.0, 0.7, 0.7, -1.5, -0.7, 2.0, 0.0 };
+  std::vector<double> joint_values = { -1.0, 0.7, 0.7, -1.5, -0.7, 2.0 };
   goal_state.setJointGroupPositions(joint_model_group, joint_values);
   moveit_msgs::Constraints joint_goal = kinematic_constraints::constructGoalConstraints(goal_state, joint_model_group);
   req.goal_constraints.clear();
@@ -295,7 +295,7 @@ int main(int argc, char** argv)
 
   pose.pose.position.x = 0.32;
   pose.pose.position.y = -0.25;
-  pose.pose.position.z = 0.65;
+  pose.pose.position.z = 0.55;
   pose.pose.orientation.w = 1.0;
   moveit_msgs::Constraints pose_goal_2 =
       kinematic_constraints::constructGoalConstraints("panda_link8", pose, tolerance_pose, tolerance_angle);

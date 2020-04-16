@@ -1,0 +1,15 @@
+<launch>
+    <!-- Start the gazebo launch file. Set gui to false to stop gui of gazebo -->
+    <include file="$(find kuka_kr6_gazebo)/launch/kuka_kr6_gazebo.launch">
+        <arg name="use_sim_time" value="true"/>
+        <arg name="gui" value="false"/>     
+    </include>
+
+    <!-- Start rviz and motion planning group -->
+    <include file="$(find kuka_kr6r900sixx_moveit_config)/launch/moveit_planning_execution.launch">
+        <arg name="use_gui" value="false"/>
+    </include>
+ 
+    <!-- Process img and publish the transform of target object in camera frame -->
+    <!--<node name="img_process" pkg="moveit_planning" type="imgProcess.py" output="screen" respawn="true"/>-->
+</launch>

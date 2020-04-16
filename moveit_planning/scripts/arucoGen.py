@@ -1,10 +1,14 @@
+#!/usr/bin/env python
 from cv2 import aruco
 import cv2
 import matplotlib.pyplot as plt
 import matplotlib as mpl
 
-aruco_dict = aruco.Dictionary_get(aruco.DICT_6X6_250)
+"""
+    This python file generate aruco pictures
+"""
 
+aruco_dict = aruco.Dictionary_get(aruco.DICT_6X6_250)
 # for i in range(1, nx*ny+1):
 #     ax = fig.add_subplot(ny,nx, i)
 #     img = aruco.drawMarker(aruco_dict,i, 700)

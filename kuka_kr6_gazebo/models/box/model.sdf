@@ -1,8 +1,8 @@
 <?xml version='1.0'?>
 <sdf version='1.6'>
-  <model name='unit_box'>
+  <model name='box'>
     <link name='link'>
-      <pose frame=''>0 0 0.091424 0 -0 0</pose>
+      <pose frame=''>0 0 0.04 0 -0 0</pose>
       <inertial>
         <mass>1</mass>
         <inertia>
@@ -22,8 +22,8 @@
         <pose frame=''>0.04001 0 -0.004 0 -0 0</pose>
         <geometry>
           <mesh>
-            <uri>model://kuka_kr6_gazebo/models/unit_box/meshes/aruco.dae</uri>
-            <scale>0.1 1.33 1.33</scale>
+            <uri>model://kuka_kr6_gazebo/models/box/meshes/unit_box.STL</uri>
+            <scale>0.001 0.001 0.001</scale>
           </mesh>
         </geometry>
         <material>
@@ -33,29 +33,6 @@
         </material>
         <cast_shadows>1</cast_shadows>
         <transparency>0</transparency>
-      </visual>
-      <visual name='visual'>
-        <geometry>
-          <box>
-            <size>0.08 0.08 0.08</size>
-          </box>
-        </geometry>
-        <material>
-          <script>
-            <name>Gazebo/Grey</name>
-            <uri>file://media/materials/scripts/gazebo.material</uri>
-          </script>
-          <shader type='pixel'>
-            <normal_map>__default__</normal_map>
-          </shader>
-          <ambient>0.3 0.3 0.3 1</ambient>
-          <diffuse>0.7 0.7 0.7 1</diffuse>
-          <specular>0.01 0.01 0.01 1</specular>
-          <emissive>0 0 0 1</emissive>
-        </material>
-        <pose frame=''>0 0 0 0 -0 0</pose>
-        <transparency>0</transparency>
-        <cast_shadows>1</cast_shadows>
       </visual>
       <collision name='collision'>
         <laser_retro>0</laser_retro>

@@ -5,14 +5,14 @@
   <remap from="/arm_controller/command" to="/joint_path_command"/>
 
   <!--arguments concerning gazebo-->
-  <param name="use_sim_time" value="true" />
-  <param name="gui" value="false" />
+  <arg name="use_sim_time" default="true" />
+  <arg name="gui" default="true" />
 
   <!-- We resume the logic in empty_world.launch, changing only the name of the world to be launched -->
   <include file="$(find gazebo_ros)/launch/empty_world.launch">
     <arg name="world_name" value="$(find kuka_kr6_gazebo)/worlds/kuka_kr6_world.world"/>
-    <arg name="use_sim_time" value="${use_sim_time}" />
-    <arg name="gui" value="false" />
+    <arg name="use_sim_time" value="$(arg use_sim_time)" />
+    <arg name="gui" value="$(arg gui)" />
   </include>
 
   <!-- Convert an xacro and put on parameter server -->

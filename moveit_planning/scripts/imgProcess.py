@@ -1,3 +1,5 @@
+#!/usr/bin/env python
+
 import cv2 
 import rospy
 from time import sleep
@@ -16,9 +18,10 @@ class imageProcess:
         self.cameraMat = None
         self.rvec = None
         self.tvec = None
+        self.pose = PoseStamped()   # The target position msg to publish
         self.corners = []
         self.ids = []
-        
+        self.tfBroadcaster = tf.TransformBroadcaster()
         self.pubTargetPose = rospy.Publisher("/kuka_arm/target_camera_cord", PoseStamped, queue_size=10)
         
         # First acquire the K matrix of the camera
@@ -44,6 +47,7 @@ class imageProcess:
         self.corners, self.ids, frame_marker = self.imgProcess(cv_image)
         self.calculateTransform()
         self.pubPose()
+        self.pubtf()
         # dist = np.array([0.0, 0.0, 0.0, 0.0, 0.0])
         # frameAxis = aruco.drawAxis(frame_marker, self.cameraMat, dist, self.rvec, self.tvec, 0.1)
         # cv2.imshow("Image Window", frameAxis)
@@ -75,24 +79,47 @@ class imageProcess:
         if self.rvec!=None:
             # Transform the tvec and rvec and publish the target object in camera coordinate
             R = np.array([[0,0,0,0],
-                            [0,0,0,0],
-                            [0,0,0,0],
-                            [0,0,0,1]], dtype=float)
+                          [0,0,0,0],
+                          [0,0,0,0],
+                          [0,0,0,1]], dtype=float)
             R[:3, :3], _ = cv2.Rodrigues(self.rvec)
             quaternion = tf.transformations.quaternion_from_matrix(R)
 
-            pose = PoseStamped()
-            pose.header.frame_id = "camera_frame"
-            pose.pose.position.x = self.tvec[0][0][0]
-            pose.pose.position.y = self.tvec[0][0][1]
-            pose.pose.position.z = self.tvec[0][0][2]
-            pose.pose.orientation.x = quaternion[0]
-            pose.pose.orientation.y = quaternion[1]
-            pose.pose.orientation.z = quaternion[2]
-            pose.pose.orientation.w = quaternion[3]
+            self.pose = PoseStamped()
+            self.pose.header.frame_id = "camera_frame"
+            # To compensate for the distance between aruco tag and the center of unit_box (that is 0.04m)
+            # pose.pose.position.x = self.tvec[0][0][0]-0.04*R[0][2]
+            # pose.pose.position.y = self.tvec[0][0][1]-0.04*R[1][2]
+            # pose.pose.position.z = self.tvec[0][0][2]-0.04*R[2][2]
+            self.pose.pose.position.x = self.tvec[0][0][0]
+            self.pose.pose.position.y = self.tvec[0][0][1]
+            self.pose.pose.position.z = self.tvec[0][0][2]
+            self.pose.pose.orientation.x = quaternion[0]
+            self.pose.pose.orientation.y = quaternion[1]
+            self.pose.pose.orientation.z = quaternion[2]
+            self.pose.pose.orientation.w = quaternion[3]
+            # print(self.pose.pose.orientation)
 
-            # print("Publishing pose")
-            self.pubTargetPose.publish(pose)
+            if abs(quaternion[0]**2 + quaternion[1]**2 + quaternion[2]**2 + quaternion[3]**2 -1) <= 1e-4:
+                # print("Publishing pose")
+                self.pubTargetPose.publish(self.pose)
+            else:
+                print("Unrecgonize pose, no tf transform is published")
+        else:
+            self.pose = PoseStamped()
+            self.pose.header.frame_id = "camera_frame"
+            self.pose.pose.orientation.w = 1
+            self.pubTargetPose.publish(self.pose)
+
+    def pubtf(self):
+        # print("Publishing tf message")
+        pos = self.pose.pose.position
+        quaternion = self.pose.pose.orientation
+        self.tfBroadcaster.sendTransform((pos.x, pos.y, pos.z),
+                                         (quaternion.x, quaternion.y, quaternion.z, quaternion.w),
+                                         rospy.Time.now(),
+                                         "target_pos", 
+                                         "camera_vision_link")
 
 def main():
     rospy.init_node('image_process', anonymous=True)

@@ -120,6 +120,7 @@ catkin_package(
 ## Your package locations should be listed before other locations
 include_directories(
   include ${catkin_INCLUDE_DIRS}
+  include ./include/moveit_planning
 # include
 # ${catkin_INCLUDE_DIRS}
 )
@@ -210,18 +211,20 @@ include_directories(
 ## Add folders to be run by python nosetests
 # catkin_add_nosetests(test)
 
-add_executable(pose_pub
-  src/pose_pub.cpp
-)
-add_dependencies(pose_pub ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
-target_link_libraries(pose_pub
-  ${catkin_LIBRARIES}
-)
-
 add_executable(moveit_planner
+  include/moveit_planning/obstacle_adder.h
   src/moveit_planner.cpp
+  src/obstacle_adder.cpp
 )
 add_dependencies(moveit_planner ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
 target_link_libraries(moveit_planner
+  ${catkin_LIBRARIES}
+)
+
+add_executable(try_move
+  src/try_move.cpp
+)
+add_dependencies(try_move ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
+target_link_libraries(try_move
   ${catkin_LIBRARIES}
 )

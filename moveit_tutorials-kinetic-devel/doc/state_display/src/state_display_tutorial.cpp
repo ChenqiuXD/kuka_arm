@@ -68,7 +68,7 @@ int main(int argc, char** argv)
   robot_state::RobotStatePtr kinematic_state(new robot_state::RobotState(kinematic_model));
 
   /* Get the configuration for the joints in the right arm of the Panda*/
-  const robot_model::JointModelGroup* joint_model_group = kinematic_model->getJointModelGroup("panda_arm");
+  const robot_model::JointModelGroup* joint_model_group = kinematic_model->getJointModelGroup("manipulator");
 
   /* PUBLISH RANDOM ARM POSITIONS */
   ros::NodeHandle nh;
@@ -98,7 +98,7 @@ int main(int argc, char** argv)
   /* Find the default pose for the end effector */
   kinematic_state->setToDefaultValues();
 
-  const Eigen::Affine3d end_effector_default_pose = kinematic_state->getGlobalLinkTransform("r_wrist_roll_link");
+  const Eigen::Affine3d end_effector_default_pose = kinematic_state->getGlobalLinkTransform("tool0");
 
   const double PI = boost::math::constants::pi<double>();
   const double RADIUS = 0.1;
