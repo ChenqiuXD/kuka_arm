@@ -1,0 +1,5 @@
+<launch>
+    <rosparam command="load" file="$(find moveit_planning)/config/joint_limits.yaml"/>
+
+    <node name="rrtPlanner" pkg="moveit_planning" type="rrtPlanner" output="screen" />
+</launch>

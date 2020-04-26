@@ -1,0 +1,2 @@
+- setup-file:
+    local-name: /home/davlee/ROS_ws/kuka_arm/src/build/devel/setup.sh

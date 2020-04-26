@@ -1,0 +1,8 @@
+prefix=/usr/local
+
+Name: kuka_kr6r900sixx_moveit_config
+Description: Description of kuka_kr6r900sixx_moveit_config
+Version: 0.1.0
+Cflags: 
+Libs: -L${prefix}/lib 
+Requires: 

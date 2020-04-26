@@ -37,20 +37,48 @@ tf::StampedTransform getTargetTrans()
     return transform;
 }
 
+void rotateTargetPose(Eigen::Quaterniond q, geometry_msgs::Pose* pose)
+{
+    // Rotate the target quaternion so that the gripper could grasp the target from top to bottom
+    Eigen::Matrix3d tarRot = q.toRotationMatrix();
+    // Rotate the matrix, axis: x, angle: 90 degree
+    Eigen::Matrix3d rotAxisX;
+    rotAxisX << 0, 0, 1,
+                0, 1, 0,
+                -1, 0, 0;
+    // rotAxisX << 1,0,0,
+    //             0,1,0,
+    //             0,0,1;
+    // Get the target pose
+    Eigen::Matrix3d result = rotAxisX * tarRot;
+    Eigen::Matrix3d qMat;
+    qMat << result(0,0), result(0,1), result(0,2),
+            result(1,0), result(1,1), result(1,2),
+            result(2,0), result(2,1), result(2,2);
+    Eigen::Quaterniond qResult;
+    qResult = qMat;
+    pose->orientation.x = qResult.x();
+    pose->orientation.y = qResult.y();
+    pose->orientation.z = qResult.z();
+    pose->orientation.w = qResult.w();
+    cout << "The final quaternion is:\n" << qResult.x() << " " << qResult.y() << " " << qResult.z() << " " << qResult.w() << endl;
+}
+
 geometry_msgs::Pose setTarget(tf::StampedTransform targetTrans)
 {
     geometry_msgs::Pose target_pose;
-    // target_pose.orientation.x = transform.getRotation().x();
-    // target_pose.orientation.y = transform.getRotation().y();
-    // target_pose.orientation.z = transform.getRotation().z();
-    // target_pose.orientation.w = transform.getRotation().w();
-    target_pose.orientation.w = 1;
+    // Get the rotation
+    Eigen::Quaterniond q(targetTrans.getRotation().x(),
+                         targetTrans.getRotation().y(),
+                         targetTrans.getRotation().z(),
+                         targetTrans.getRotation().w());
+    cout << "The rotation of target is: \n" << q.x() << " " << q.y() << " " << q.z() << " " << q.w() << endl; 
+    rotateTargetPose(q, &target_pose);
+
+    // Get the translation
     target_pose.position.x = targetTrans.getOrigin().x();
     target_pose.position.y = targetTrans.getOrigin().y();
-    target_pose.position.z = targetTrans.getOrigin().z();
-    target_pose.position.z += 0.3;
-
-    // cout << target_pose.orientation.x << target_pose.orientation.y << target_pose.orientation.z << target_pose.orientation.w << endl;
+    target_pose.position.z = targetTrans.getOrigin().z()+0.08;
     return target_pose;
 }
 
@@ -70,7 +98,7 @@ int main(int argc, char** argv)
         move_group.getCurrentState()->getJointModelGroup(PLANNING_GROUP);
 
     // Initialize the obstacle adder to add obstacle from gazebo
-    // Obstacle_Adder obs_adder = Obstacle_Adder(nh, &planning_scene_interface);
+    Obstacle_Adder obs_adder = Obstacle_Adder(nh, &planning_scene_interface);
 
     // Start moveit visual tools
     namespace rvt = rviz_visual_tools;
@@ -82,16 +110,16 @@ int main(int argc, char** argv)
     // MAIN LOOP
     ROS_INFO("Currently running moveit planning");
     while(ros::ok()){
-        // Refreshe the obstacles for next plan
+        // Refresh the obstacles for next plan
         // planning_scene_interface.world.collision_objects.clear();
-        // obs_adder.add_obstacles();
+        obs_adder.add_obstacles();
 
         visual_tools.prompt("Press 'next' to plan a path");
 
         // Listen to tf broadcaster and set the transform as the move_group target
         tf::StampedTransform transform = getTargetTrans();
         tf::Quaternion q = transform.getRotation();
-        move_group.setGoalTolerance(0.05);
+        move_group.setGoalTolerance(0.005);
         // If did not get any of the target transform, the 2-norm of quaernion would not equals 1
         if(pow(q[0],2) + pow(q[1],2) + pow(q[2],2) + pow(q[3],2) == 1){   
             ROS_INFO("Entering the planning mode");     

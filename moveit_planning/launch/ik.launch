@@ -1,0 +1,8 @@
+<launch>
+  <!-- Load the URDF, SRDF and other .yaml configuration files on the param server -->
+  <include file="$(find kuka_kr6r900sixx_moveit_config)/launch/planning_context.launch">
+    <arg name="load_robot_description" value="true"/>
+  </include>
+
+   <node name="ik" pkg="moveit_planning" type="ik" output="screen" respawn="false"/>
+</launch>

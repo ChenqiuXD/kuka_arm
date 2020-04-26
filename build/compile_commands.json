@@ -1,0 +1,107 @@
+[
+{
+  "directory": "/home/davlee/ROS_ws/kuka_arm/src/build/gtest",
+  "command": "/usr/bin/x86_64-linux-gnu-g++-5   -DGTEST_CREATE_SHARED_LIBRARY=1 -Dgmock_EXPORTS -I/usr/src/gmock/include -I/usr/src/gmock -I/usr/src/gtest/include -I/usr/src/gtest  -g -fPIC    -Wall -Wshadow -DGTEST_HAS_PTHREAD=1 -fexceptions -Wextra -Wno-unused-parameter -Wno-missing-field-initializers -o CMakeFiles/gmock.dir/usr/src/gtest/src/gtest-all.cc.o -c /usr/src/gtest/src/gtest-all.cc",
+  "file": "/usr/src/gtest/src/gtest-all.cc"
+},
+{
+  "directory": "/home/davlee/ROS_ws/kuka_arm/src/build/gtest",
+  "command": "/usr/bin/x86_64-linux-gnu-g++-5   -DGTEST_CREATE_SHARED_LIBRARY=1 -Dgmock_EXPORTS -I/usr/src/gmock/include -I/usr/src/gmock -I/usr/src/gtest/include -I/usr/src/gtest  -g -fPIC    -Wall -Wshadow -DGTEST_HAS_PTHREAD=1 -fexceptions -Wextra -Wno-unused-parameter -Wno-missing-field-initializers -o CMakeFiles/gmock.dir/src/gmock-all.cc.o -c /usr/src/gmock/src/gmock-all.cc",
+  "file": "/usr/src/gmock/src/gmock-all.cc"
+},
+{
+  "directory": "/home/davlee/ROS_ws/kuka_arm/src/build/gtest",
+  "command": "/usr/bin/x86_64-linux-gnu-g++-5   -DGTEST_CREATE_SHARED_LIBRARY=1 -Dgmock_main_EXPORTS -I/usr/src/gmock/include -I/usr/src/gmock -I/usr/src/gtest/include -I/usr/src/gtest  -g -fPIC    -Wall -Wshadow -DGTEST_HAS_PTHREAD=1 -fexceptions -Wextra -Wno-unused-parameter -Wno-missing-field-initializers -o CMakeFiles/gmock_main.dir/usr/src/gtest/src/gtest-all.cc.o -c /usr/src/gtest/src/gtest-all.cc",
+  "file": "/usr/src/gtest/src/gtest-all.cc"
+},
+{
+  "directory": "/home/davlee/ROS_ws/kuka_arm/src/build/gtest",
+  "command": "/usr/bin/x86_64-linux-gnu-g++-5   -DGTEST_CREATE_SHARED_LIBRARY=1 -Dgmock_main_EXPORTS -I/usr/src/gmock/include -I/usr/src/gmock -I/usr/src/gtest/include -I/usr/src/gtest  -g -fPIC    -Wall -Wshadow -DGTEST_HAS_PTHREAD=1 -fexceptions -Wextra -Wno-unused-parameter -Wno-missing-field-initializers -o CMakeFiles/gmock_main.dir/src/gmock-all.cc.o -c /usr/src/gmock/src/gmock-all.cc",
+  "file": "/usr/src/gmock/src/gmock-all.cc"
+},
+{
+  "directory": "/home/davlee/ROS_ws/kuka_arm/src/build/gtest",
+  "command": "/usr/bin/x86_64-linux-gnu-g++-5   -DGTEST_CREATE_SHARED_LIBRARY=1 -Dgmock_main_EXPORTS -I/usr/src/gmock/include -I/usr/src/gmock -I/usr/src/gtest/include -I/usr/src/gtest  -g -fPIC    -Wall -Wshadow -DGTEST_HAS_PTHREAD=1 -fexceptions -Wextra -Wno-unused-parameter -Wno-missing-field-initializers -o CMakeFiles/gmock_main.dir/src/gmock_main.cc.o -c /usr/src/gmock/src/gmock_main.cc",
+  "file": "/usr/src/gmock/src/gmock_main.cc"
+},
+{
+  "directory": "/home/davlee/ROS_ws/kuka_arm/src/build/gtest/gtest",
+  "command": "/usr/bin/x86_64-linux-gnu-g++-5   -DGTEST_CREATE_SHARED_LIBRARY=1 -Dgtest_EXPORTS -I/usr/src/gtest/include -I/usr/src/gtest  -g -fPIC    -Wall -Wshadow -DGTEST_HAS_PTHREAD=1 -fexceptions -Wextra -Wno-unused-parameter -Wno-missing-field-initializers -o CMakeFiles/gtest.dir/src/gtest-all.cc.o -c /usr/src/gtest/src/gtest-all.cc",
+  "file": "/usr/src/gtest/src/gtest-all.cc"
+},
+{
+  "directory": "/home/davlee/ROS_ws/kuka_arm/src/build/gtest/gtest",
+  "command": "/usr/bin/x86_64-linux-gnu-g++-5   -DGTEST_CREATE_SHARED_LIBRARY=1 -Dgtest_main_EXPORTS -I/usr/src/gtest/include -I/usr/src/gtest  -g -fPIC    -Wall -Wshadow -DGTEST_HAS_PTHREAD=1 -fexceptions -Wextra -Wno-unused-parameter -Wno-missing-field-initializers -o CMakeFiles/gtest_main.dir/src/gtest_main.cc.o -c /usr/src/gtest/src/gtest_main.cc",
+  "file": "/usr/src/gtest/src/gtest_main.cc"
+},
+{
+  "directory": "/home/davlee/ROS_ws/kuka_arm/src/build/trac_ik/trac_ik_lib",
+  "command": "/usr/bin/x86_64-linux-gnu-g++-5   -DROSCONSOLE_BACKEND_LOG4CXX -DROS_BUILD_SHARED_LIBS=1 -DROS_PACKAGE_NAME=\\\"trac_ik_lib\\\" -Dtrac_ik_EXPORTS -I/home/davlee/ROS_ws/kuka_arm/src/trac_ik/trac_ik_lib/include -I/opt/ros/kinetic/include -I/opt/ros/kinetic/share/orocos_kdl/../../include -I/opt/ros/kinetic/share/xmlrpcpp/cmake/../../../include/xmlrpcpp -I/usr/include/eigen3  -std=c++11  -g -fPIC   -o CMakeFiles/trac_ik.dir/src/kdl_tl.cpp.o -c /home/davlee/ROS_ws/kuka_arm/src/trac_ik/trac_ik_lib/src/kdl_tl.cpp",
+  "file": "/home/davlee/ROS_ws/kuka_arm/src/trac_ik/trac_ik_lib/src/kdl_tl.cpp"
+},
+{
+  "directory": "/home/davlee/ROS_ws/kuka_arm/src/build/trac_ik/trac_ik_lib",
+  "command": "/usr/bin/x86_64-linux-gnu-g++-5   -DROSCONSOLE_BACKEND_LOG4CXX -DROS_BUILD_SHARED_LIBS=1 -DROS_PACKAGE_NAME=\\\"trac_ik_lib\\\" -Dtrac_ik_EXPORTS -I/home/davlee/ROS_ws/kuka_arm/src/trac_ik/trac_ik_lib/include -I/opt/ros/kinetic/include -I/opt/ros/kinetic/share/orocos_kdl/../../include -I/opt/ros/kinetic/share/xmlrpcpp/cmake/../../../include/xmlrpcpp -I/usr/include/eigen3  -std=c++11  -g -fPIC   -o CMakeFiles/trac_ik.dir/src/nlopt_ik.cpp.o -c /home/davlee/ROS_ws/kuka_arm/src/trac_ik/trac_ik_lib/src/nlopt_ik.cpp",
+  "file": "/home/davlee/ROS_ws/kuka_arm/src/trac_ik/trac_ik_lib/src/nlopt_ik.cpp"
+},
+{
+  "directory": "/home/davlee/ROS_ws/kuka_arm/src/build/trac_ik/trac_ik_lib",
+  "command": "/usr/bin/x86_64-linux-gnu-g++-5   -DROSCONSOLE_BACKEND_LOG4CXX -DROS_BUILD_SHARED_LIBS=1 -DROS_PACKAGE_NAME=\\\"trac_ik_lib\\\" -Dtrac_ik_EXPORTS -I/home/davlee/ROS_ws/kuka_arm/src/trac_ik/trac_ik_lib/include -I/opt/ros/kinetic/include -I/opt/ros/kinetic/share/orocos_kdl/../../include -I/opt/ros/kinetic/share/xmlrpcpp/cmake/../../../include/xmlrpcpp -I/usr/include/eigen3  -std=c++11  -g -fPIC   -o CMakeFiles/trac_ik.dir/src/trac_ik.cpp.o -c /home/davlee/ROS_ws/kuka_arm/src/trac_ik/trac_ik_lib/src/trac_ik.cpp",
+  "file": "/home/davlee/ROS_ws/kuka_arm/src/trac_ik/trac_ik_lib/src/trac_ik.cpp"
+},
+{
+  "directory": "/home/davlee/ROS_ws/kuka_arm/src/build/trac_ik/trac_ik_examples",
+  "command": "/usr/bin/x86_64-linux-gnu-g++-5   -DROSCONSOLE_BACKEND_LOG4CXX -DROS_BUILD_SHARED_LIBS=1 -DROS_PACKAGE_NAME=\\\"trac_ik_examples\\\" -I/home/davlee/ROS_ws/kuka_arm/src/trac_ik/trac_ik_lib/include -I/opt/ros/kinetic/include -I/opt/ros/kinetic/share/orocos_kdl/../../include -I/opt/ros/kinetic/share/xmlrpcpp/cmake/../../../include/xmlrpcpp -I/usr/include/eigen3  -std=c++11  -g   -o CMakeFiles/ik_tests.dir/src/ik_tests.cpp.o -c /home/davlee/ROS_ws/kuka_arm/src/trac_ik/trac_ik_examples/src/ik_tests.cpp",
+  "file": "/home/davlee/ROS_ws/kuka_arm/src/trac_ik/trac_ik_examples/src/ik_tests.cpp"
+},
+{
+  "directory": "/home/davlee/ROS_ws/kuka_arm/src/build/trac_ik/trac_ik_kinematics_plugin",
+  "command": "/usr/bin/x86_64-linux-gnu-g++-5   -DROSCONSOLE_BACKEND_LOG4CXX -DROS_BUILD_SHARED_LIBS=1 -DROS_PACKAGE_NAME=\\\"trac_ik_kinematics_plugin\\\" -Dtrac_ik_kinematics_plugin_EXPORTS -I/home/davlee/ROS_ws/kuka_arm/src/trac_ik/trac_ik_kinematics_plugin/include -I/home/davlee/ROS_ws/kuka_arm/src/trac_ik/trac_ik_lib/include -I/opt/ros/kinetic/include -I/opt/ros/kinetic/share/orocos_kdl/../../include -I/opt/ros/kinetic/share/xmlrpcpp/cmake/../../../include/xmlrpcpp -I/usr/include/eigen3  -std=c++0x  -g -fPIC   -o CMakeFiles/trac_ik_kinematics_plugin.dir/src/trac_ik_kinematics_plugin.cpp.o -c /home/davlee/ROS_ws/kuka_arm/src/trac_ik/trac_ik_kinematics_plugin/src/trac_ik_kinematics_plugin.cpp",
+  "file": "/home/davlee/ROS_ws/kuka_arm/src/trac_ik/trac_ik_kinematics_plugin/src/trac_ik_kinematics_plugin.cpp"
+},
+{
+  "directory": "/home/davlee/ROS_ws/kuka_arm/src/build/trac_ik/trac_ik_python",
+  "command": "/usr/bin/x86_64-linux-gnu-g++-5  -DROSCONSOLE_BACKEND_LOG4CXX -DROS_BUILD_SHARED_LIBS=1 -DROS_PACKAGE_NAME=\\\"trac_ik_python\\\" -D_trac_ik_wrap_EXPORTS -I/home/davlee/ROS_ws/kuka_arm/src/trac_ik/trac_ik_lib/include -I/opt/ros/kinetic/include -I/opt/ros/kinetic/share/orocos_kdl/../../include -I/opt/ros/kinetic/share/xmlrpcpp/cmake/../../../include/xmlrpcpp -I/usr/include/eigen3 -I/usr/include/python2.7  -g -fPIC   -std=c++11 -Wno-deprecated -o CMakeFiles/_trac_ik_wrap.dir/trac_ik_wrapPYTHON_wrap.c.o   -c /home/davlee/ROS_ws/kuka_arm/src/build/trac_ik/trac_ik_python/trac_ik_wrapPYTHON_wrap.c",
+  "file": "/home/davlee/ROS_ws/kuka_arm/src/build/trac_ik/trac_ik_python/trac_ik_wrapPYTHON_wrap.c"
+},
+{
+  "directory": "/home/davlee/ROS_ws/kuka_arm/src/build/moveit_planning",
+  "command": "/usr/bin/x86_64-linux-gnu-g++-5   -DROSCONSOLE_BACKEND_LOG4CXX -DROS_BUILD_SHARED_LIBS=1 -DROS_PACKAGE_NAME=\\\"moveit_planning\\\" -I/home/davlee/ROS_ws/kuka_arm/src/moveit_planning/include -I/opt/ros/kinetic/include -I/opt/ros/kinetic/share/xmlrpcpp/cmake/../../../include/xmlrpcpp -I/opt/ros/kinetic/share/orocos_kdl/../../include -I/usr/include/eigen3 -I/home/davlee/ROS_ws/kuka_arm/src/moveit_planning/./include/moveit_planning  -g   -std=c++11 -o CMakeFiles/rrtPlanner.dir/src/rrtEnv.cpp.o -c /home/davlee/ROS_ws/kuka_arm/src/moveit_planning/src/rrtEnv.cpp",
+  "file": "/home/davlee/ROS_ws/kuka_arm/src/moveit_planning/src/rrtEnv.cpp"
+},
+{
+  "directory": "/home/davlee/ROS_ws/kuka_arm/src/build/moveit_planning",
+  "command": "/usr/bin/x86_64-linux-gnu-g++-5   -DROSCONSOLE_BACKEND_LOG4CXX -DROS_BUILD_SHARED_LIBS=1 -DROS_PACKAGE_NAME=\\\"moveit_planning\\\" -I/home/davlee/ROS_ws/kuka_arm/src/moveit_planning/include -I/opt/ros/kinetic/include -I/opt/ros/kinetic/share/xmlrpcpp/cmake/../../../include/xmlrpcpp -I/opt/ros/kinetic/share/orocos_kdl/../../include -I/usr/include/eigen3 -I/home/davlee/ROS_ws/kuka_arm/src/moveit_planning/./include/moveit_planning  -g   -std=c++11 -o CMakeFiles/rrtPlanner.dir/src/rrtPlanner.cpp.o -c /home/davlee/ROS_ws/kuka_arm/src/moveit_planning/src/rrtPlanner.cpp",
+  "file": "/home/davlee/ROS_ws/kuka_arm/src/moveit_planning/src/rrtPlanner.cpp"
+},
+{
+  "directory": "/home/davlee/ROS_ws/kuka_arm/src/build/moveit_planning",
+  "command": "/usr/bin/x86_64-linux-gnu-g++-5   -DROSCONSOLE_BACKEND_LOG4CXX -DROS_BUILD_SHARED_LIBS=1 -DROS_PACKAGE_NAME=\\\"moveit_planning\\\" -I/home/davlee/ROS_ws/kuka_arm/src/moveit_planning/include -I/opt/ros/kinetic/include -I/opt/ros/kinetic/share/xmlrpcpp/cmake/../../../include/xmlrpcpp -I/opt/ros/kinetic/share/orocos_kdl/../../include -I/usr/include/eigen3 -I/home/davlee/ROS_ws/kuka_arm/src/moveit_planning/./include/moveit_planning  -g   -std=c++11 -o CMakeFiles/try.dir/src/try.cpp.o -c /home/davlee/ROS_ws/kuka_arm/src/moveit_planning/src/try.cpp",
+  "file": "/home/davlee/ROS_ws/kuka_arm/src/moveit_planning/src/try.cpp"
+},
+{
+  "directory": "/home/davlee/ROS_ws/kuka_arm/src/build/moveit_planning",
+  "command": "/usr/bin/x86_64-linux-gnu-g++-5   -DROSCONSOLE_BACKEND_LOG4CXX -DROS_BUILD_SHARED_LIBS=1 -DROS_PACKAGE_NAME=\\\"moveit_planning\\\" -I/home/davlee/ROS_ws/kuka_arm/src/moveit_planning/include -I/opt/ros/kinetic/include -I/opt/ros/kinetic/share/xmlrpcpp/cmake/../../../include/xmlrpcpp -I/opt/ros/kinetic/share/orocos_kdl/../../include -I/usr/include/eigen3 -I/home/davlee/ROS_ws/kuka_arm/src/moveit_planning/./include/moveit_planning  -g   -std=c++11 -o CMakeFiles/moveit_planner.dir/src/moveit_planner.cpp.o -c /home/davlee/ROS_ws/kuka_arm/src/moveit_planning/src/moveit_planner.cpp",
+  "file": "/home/davlee/ROS_ws/kuka_arm/src/moveit_planning/src/moveit_planner.cpp"
+},
+{
+  "directory": "/home/davlee/ROS_ws/kuka_arm/src/build/moveit_planning",
+  "command": "/usr/bin/x86_64-linux-gnu-g++-5   -DROSCONSOLE_BACKEND_LOG4CXX -DROS_BUILD_SHARED_LIBS=1 -DROS_PACKAGE_NAME=\\\"moveit_planning\\\" -I/home/davlee/ROS_ws/kuka_arm/src/moveit_planning/include -I/opt/ros/kinetic/include -I/opt/ros/kinetic/share/xmlrpcpp/cmake/../../../include/xmlrpcpp -I/opt/ros/kinetic/share/orocos_kdl/../../include -I/usr/include/eigen3 -I/home/davlee/ROS_ws/kuka_arm/src/moveit_planning/./include/moveit_planning  -g   -std=c++11 -o CMakeFiles/moveit_planner.dir/src/obstacle_adder.cpp.o -c /home/davlee/ROS_ws/kuka_arm/src/moveit_planning/src/obstacle_adder.cpp",
+  "file": "/home/davlee/ROS_ws/kuka_arm/src/moveit_planning/src/obstacle_adder.cpp"
+},
+{
+  "directory": "/home/davlee/ROS_ws/kuka_arm/src/build/moveit_planning",
+  "command": "/usr/bin/x86_64-linux-gnu-g++-5   -DROSCONSOLE_BACKEND_LOG4CXX -DROS_BUILD_SHARED_LIBS=1 -DROS_PACKAGE_NAME=\\\"moveit_planning\\\" -I/home/davlee/ROS_ws/kuka_arm/src/moveit_planning/include -I/opt/ros/kinetic/include -I/opt/ros/kinetic/share/xmlrpcpp/cmake/../../../include/xmlrpcpp -I/opt/ros/kinetic/share/orocos_kdl/../../include -I/usr/include/eigen3 -I/home/davlee/ROS_ws/kuka_arm/src/moveit_planning/./include/moveit_planning  -g   -std=c++11 -o CMakeFiles/ik.dir/src/ik.cpp.o -c /home/davlee/ROS_ws/kuka_arm/src/moveit_planning/src/ik.cpp",
+  "file": "/home/davlee/ROS_ws/kuka_arm/src/moveit_planning/src/ik.cpp"
+},
+{
+  "directory": "/home/davlee/ROS_ws/kuka_arm/src/build/moveit_planning",
+  "command": "/usr/bin/x86_64-linux-gnu-g++-5   -DROSCONSOLE_BACKEND_LOG4CXX -DROS_BUILD_SHARED_LIBS=1 -DROS_PACKAGE_NAME=\\\"moveit_planning\\\" -I/home/davlee/ROS_ws/kuka_arm/src/moveit_planning/include -I/opt/ros/kinetic/include -I/opt/ros/kinetic/share/xmlrpcpp/cmake/../../../include/xmlrpcpp -I/opt/ros/kinetic/share/orocos_kdl/../../include -I/usr/include/eigen3 -I/home/davlee/ROS_ws/kuka_arm/src/moveit_planning/./include/moveit_planning  -g   -std=c++11 -o CMakeFiles/try_move.dir/src/try_move.cpp.o -c /home/davlee/ROS_ws/kuka_arm/src/moveit_planning/src/try_move.cpp",
+  "file": "/home/davlee/ROS_ws/kuka_arm/src/moveit_planning/src/try_move.cpp"
+},
+{
+  "directory": "/home/davlee/ROS_ws/kuka_arm/src/build/moveit_tutorials-kinetic-devel/doc/kinematics",
+  "command": "/usr/bin/x86_64-linux-gnu-g++-5   -DROSCONSOLE_BACKEND_LOG4CXX -DROS_BUILD_SHARED_LIBS=1 -DROS_PACKAGE_NAME=\\\"moveit_tutorials\\\" -isystem /home/davlee/ROS_ws/kuka_arm/src/moveit_tutorials-kinetic-devel/doc/interactivity/include -isystem /usr/include/eigen3 -I/opt/ros/kinetic/include -I/opt/ros/kinetic/share/xmlrpcpp/cmake/../../../include/xmlrpcpp -I/opt/ros/kinetic/share/orocos_kdl/../../include -I/usr/include/pcl-1.7 -I/usr/include/ni -I/usr/include/vtk-6.2 -I/usr/lib/openmpi/include/openmpi/opal/mca/event/libevent2021/libevent -I/usr/lib/openmpi/include/openmpi/opal/mca/event/libevent2021/libevent/include -I/usr/lib/openmpi/include -I/usr/lib/openmpi/include/openmpi -I/usr/include/jsoncpp -I/usr/include/freetype2 -I/usr/include/python2.7 -I/usr/include/x86_64-linux-gnu -I/usr/include/tcl -I/usr/include/libxml2  -g   -std=c++11 -o CMakeFiles/ros_api_tutorial.dir/src/ros_api_tutorial.cpp.o -c /home/davlee/ROS_ws/kuka_arm/src/moveit_tutorials-kinetic-devel/doc/kinematics/src/ros_api_tutorial.cpp",
+  "file": "/home/davlee/ROS_ws/kuka_arm/src/moveit_tutorials-kinetic-devel/doc/kinematics/src/ros_api_tutorial.cpp"
+}
+]

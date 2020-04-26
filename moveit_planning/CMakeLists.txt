@@ -37,11 +37,15 @@ find_package(catkin REQUIRED)
 find_package(catkin REQUIRED COMPONENTS
   roscpp
   tf
+  tf2_ros
+  tf2_eigen
+  tf2_geometry_msgs
   moveit_visual_tools
   moveit_core
   moveit_ros_planning
   moveit_ros_planning_interface
 )
+find_package(Eigen3 REQUIRED)
 ##   * add "message_runtime" and every package in MSG_DEP_SET to
 ##     catkin_package(CATKIN_DEPENDS ...)
 ##   * uncomment the add_*_files sections below as needed
@@ -109,7 +113,8 @@ catkin_package(
 #  INCLUDE_DIRS include
 #  LIBRARIES moveit_planning
 #  CATKIN_DEPENDS
-#  DEPENDS system_lib
+ DEPENDS 
+  EIGEN3
 )
 
 ###########
@@ -226,5 +231,31 @@ add_executable(try_move
 )
 add_dependencies(try_move ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
 target_link_libraries(try_move
+  ${catkin_LIBRARIES}
+)
+
+add_executable(ik
+  src/ik.cpp
+)
+add_dependencies(ik ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
+target_link_libraries(ik
+  ${catkin_LIBRARIES}
+)
+
+add_executable(try
+  src/try.cpp
+)
+add_dependencies(try ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
+target_link_libraries(try
+  ${catkin_LIBRARIES}
+)
+
+add_executable(rrtPlanner
+  src/rrtEnv.cpp
+  src/rrtPlanner.cpp
+  include/moveit_planning/rrtPlanner.h
+)
+add_dependencies(rrtPlanner ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
+target_link_libraries(rrtPlanner
   ${catkin_LIBRARIES}
 )

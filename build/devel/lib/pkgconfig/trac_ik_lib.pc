@@ -1,0 +1,8 @@
+prefix=/home/davlee/ROS_ws/kuka_arm/src/build/devel
+
+Name: trac_ik_lib
+Description: Description of trac_ik_lib
+Version: 1.5.1
+Cflags: -I/home/davlee/ROS_ws/kuka_arm/src/trac_ik/trac_ik_lib/include -I/usr/include
+Libs: -L${prefix}/lib -ltrac_ik /usr/lib/x86_64-linux-gnu/libboost_date_time.so
+Requires: kdl_parser roscpp urdf

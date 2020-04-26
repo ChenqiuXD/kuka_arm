@@ -1,0 +1,8 @@
+# Copied by LJH from the urdf file in "kuka_kr6_description" package for the convenience of completing rrt code
+joint_limits:
+      joint_a1: {upper: 170, lower: -170}
+      joint_a2: {upper: 190, lower: -75}
+      joint_a3: {upper: 120, lower: -156}
+      joint_a4: {upper: 185, lower: -185}
+      joint_a5: {upper: 120, lower: -120}
+      joint_a6: {upper: 350, lower: -350}

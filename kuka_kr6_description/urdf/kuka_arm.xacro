@@ -4,15 +4,14 @@
     <xacro:include filename="$(find kuka_kr6_description)/urdf/common_constants/common_constants.xacro"/>
     <xacro:include filename="$(find kuka_kr6_description)/urdf/sensors/camera.urdf.xacro"/>
     <xacro:include filename="$(find kuka_kr6_description)/urdf/kuka_kr6r900sixx.xacro"/>
+    <!--<xacro:include filename="$(find kuka_kr6_description)/urdf/gripper.xacro"/>-->
 
     <link name="world"/>
     <joint name="world_joint" type="fixed">
         <parent link="world" />
-        <child link = "base_link" />
+        <child link="base_link" />
         <origin xyz="0 0 0." rpy="0.0 0.0 0.0" />
     </joint>
-
-
 
     <!--############################################################################################-->
         <!--Definition of transimission, intended for gazebo-ros-control-->
