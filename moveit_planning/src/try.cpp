@@ -1,34 +1,97 @@
+#include <ros/ros.h>
+#include <std_msgs/Header.h>
 #include <tf/transform_datatypes.h>
-#include <tf_conversions/tf_eigen.h>
-#include <Eigen/Core>
-#include <Eigen/Geometry>
+#include <moveit_msgs/DisplayTrajectory.h>
+#include <moveit_msgs/RobotTrajectory.h>
+#include <actionlib_msgs/GoalStatusArray.h>
+#include <actionlib_msgs/GoalStatus.h>
+#include <actionlib_msgs/GoalID.h>
+
+#include <vector>
 
 using namespace std;
 
+void getRobotTraj(vector<moveit_msgs::RobotTrajectory>* trajectory)
+{
+    moveit_msgs::RobotTrajectory robot_trajectory;
+    trajectory_msgs::JointTrajectory joint_trajectory;
+    std_msgs::Header header;
+    header.seq = 0;
+    header.frame_id = "/world";
+
+    int wayPointNum = 10;
+    vector<trajectory_msgs::JointTrajectoryPoint> wayPoints;
+    for(size_t i=0;i<wayPointNum;i++){
+        trajectory_msgs::JointTrajectoryPoint point;
+        point.positions = {i*0.1, i*0.1, i*0.1, i*0.1, i*0.1, i*0.1};
+        // point.time_from_start = 0.1*i;
+        wayPoints.push_back(point);
+    }
+
+    joint_trajectory.header = header;
+    joint_trajectory.joint_names = {"joint_a1", "joint_a2", "joint_a3", "joint_a4", "joint_a5", "joint_a6"};
+    joint_trajectory.points = wayPoints;
+
+    robot_trajectory.joint_trajectory = joint_trajectory;
+    trajectory->push_back(robot_trajectory);
+}
+
+void getTrajectoryStart(moveit_msgs::RobotState* trajectory_start)
+{
+    std_msgs::Header header;
+    header.seq = 0;
+    header.frame_id = "/world";
+
+    sensor_msgs::JointState joint_state;
+    joint_state.header = header;
+    joint_state.name = {"joint_a1", "joint_a2", "joint_a3", "joint_a4", "joint_a5", "joint_a6"};
+    joint_state.position = {0,0,0,0,0,0};
+    joint_state.velocity = {0,0,0,0,0,0};
+    joint_state.effort = {0,0,0,0,0,0};
+
+    trajectory_start->joint_state = joint_state;
+}
+
+void getStatus(actionlib_msgs::GoalStatusArray* status)
+{
+    std_msgs::Header header;
+    header.seq = 0;
+    header.frame_id = "/world";
+    status->header = header;
+
+    actionlib_msgs::GoalStatus goal_status;
+    goal_status.status = goal_status.SUCCEEDED;
+    actionlib_msgs::GoalID goal_id;
+    goal_id.id = "moveit_rviz";
+    goal_status.goal_id = goal_id;
+    goal_status.text = "Motion plan was computed succesfully";
+    status->status_list.push_back(goal_status);
+}
+
 int main(int argc, char** argv)
 {
-    tf::Quaternion q1, q2, q3;
-    double result, PI = 3.1416;
-    q1.setEuler(0, 0, 0);
-    q2.setEuler(-PI/2, PI/2, 0);
-    tf::Vector3 ex = q1.getAxis();
-    double angle = q1.getAngle();
-    cout << "q1 axis is: " << ex.x() << " "<< ex.y() << " "<< ex.z() <<" "<<"and the angle is: "<<angle <<endl;
-    ex = q2.getAxis();
-    cout << "q2's value is: " << ex.x() << " "<< ex.y() << " "<< ex.z() <<" "<<q2.getW()<<endl;
+    ros::init(argc, argv, "pos_listener");
+    ros::NodeHandle nh;
+    ros::AsyncSpinner spinner(1);
+    spinner.start();
 
-    Eigen::Quaterniond t3;
-    tf::quaternionTFToEigen(q2,t3);
-    cout << "t3's value is:" << t3.x()<<" "<<t3.y()<<" "<<t3.z()<<" "<<t3.w()  << endl;
-    // cout << "t3's matrix is: " << t3.Vector3 << endl;
-    Eigen::Matrix3d a = t3.toRotationMatrix();
-    cout << "First a is:\n" <<a << endl;
+    ros::Publisher trajPub = nh.advertise<moveit_msgs::DisplayTrajectory>("/move_group/display_planned_path", 1);
+    ros::Publisher statusPub = nh.advertise<actionlib_msgs::GoalStatusArray>("/move_group/status", 1);
 
-    Eigen::Matrix3d xRot;
-    xRot(0,0)=1;xRot(0,1)=0;xRot(0,2)=0;
-    xRot(1,0)=0;xRot(1,1)=0;xRot(1,2)=-1;
-    xRot(2,0)=0;xRot(2,1)=1;xRot(2,2)=0;
+    moveit_msgs::DisplayTrajectory traj;
+    traj.model_id = "kuka_kr6";    
+    getRobotTraj(&traj.trajectory);
+    getTrajectoryStart(&traj.trajectory_start);
+    
+    actionlib_msgs::GoalStatusArray status;
+    getStatus(&status);
 
-    a = xRot*a;
-    cout << "Now a is:\n" << a << endl;
+    ros::Rate loop_rate(30);
+    while(ros::ok()){
+        trajPub.publish(traj);
+        statusPub.publish(status);
+        loop_rate.sleep();
+    }
+    
+    return 0;
 }

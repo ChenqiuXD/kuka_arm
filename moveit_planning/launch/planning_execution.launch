@@ -1,4 +1,0 @@
-<launch>
-    <node name="img_process" pkg="moveit_planning" type="imgProcess.py" output="screen" respawn="true" />
-    <node name="planner" pkg="moveit_planning" type="moveit_planner" output="screen" respawn="false" />
-</launch>

@@ -134,8 +134,6 @@ int main(int argc, char** argv)
             // Plan the path
             moveit::planning_interface::MoveGroupInterface::Plan my_plan;
             bool success = (move_group.plan(my_plan) == moveit::planning_interface::MoveItErrorCode::SUCCESS);
-            if(success){move_group.execute(my_plan);}
-            // You can also use move_group.move(), which would plan and execute.
 
             ROS_INFO_NAMED("tutorial", "Visualizing plan 1 (pose goal) %s", success ? "" : "FAILED");
 

@@ -251,9 +251,11 @@ target_link_libraries(try
 )
 
 add_executable(rrtPlanner
-  src/rrtEnv.cpp
+  src/obstacle_adder.cpp
   src/rrtPlanner.cpp
+  src/moveit_planner_rrt.cpp
   include/moveit_planning/rrtPlanner.h
+  include/moveit_planning/obstacle_adder.h
 )
 add_dependencies(rrtPlanner ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
 target_link_libraries(rrtPlanner

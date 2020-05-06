@@ -3,6 +3,7 @@
 #include <geometry_msgs/Pose.h>
 #include <gazebo_msgs/LinkStates.h>
 #include <math.h>
+#include <time.h>
 #include <Eigen/Dense>
 
 #include <moveit_visual_tools/moveit_visual_tools.h>
@@ -15,6 +16,7 @@
 #include <tf/transform_datatypes.h>
 
 #include "obstacle_adder.h"
+#include "rrtPlanner.h"
 
 using namespace std;
 
@@ -97,8 +99,13 @@ int main(int argc, char** argv)
     const robot_state::JointModelGroup* joint_model_group =
         move_group.getCurrentState()->getJointModelGroup(PLANNING_GROUP);
 
-    // Initialize the obstacle adder to add obstacle from gazebo
+    robot_model_loader::RobotModelLoader robot_model_loader("robot_description");
+    robot_model::RobotModelPtr kinematic_model = robot_model_loader.getModel();
+    planning_scene::PlanningScene planning_scene(kinematic_model);
+
+    // Initialize the obstacleAdder and rrtPlanner
     Obstacle_Adder obs_adder = Obstacle_Adder(nh, &planning_scene_interface);
+    rrtPlanner rrt_planner = rrtPlanner(nh, kinematic_model, &planning_scene);
 
     // Start moveit visual tools
     namespace rvt = rviz_visual_tools;
@@ -119,30 +126,39 @@ int main(int argc, char** argv)
         // Listen to tf broadcaster and set the transform as the move_group target
         tf::StampedTransform transform = getTargetTrans();
         tf::Quaternion q = transform.getRotation();
-        move_group.setGoalTolerance(0.005);
-        // If did not get any of the target transform, the 2-norm of quaernion would not equals 1
+
+        // Check whether receive any transform
         if(pow(q[0],2) + pow(q[1],2) + pow(q[2],2) + pow(q[3],2) == 1){   
             ROS_INFO("Entering the planning mode");     
             geometry_msgs::Pose target_pose = setTarget(transform);
-            move_group.setPoseTarget(target_pose);
-            // if(iter%3=0){add_obstacles(nh);}
+            rrt_planner.generateGraspPose(target_pose);
 
             ROS_INFO("The target_pose is received");
             cout << "The orientation are: " << target_pose.orientation.x << " " << target_pose.orientation.y << " " << target_pose.orientation.z << " " << target_pose.orientation.w << endl;
             cout << "The translations are: " << target_pose.position.x << " " << target_pose.position.y << " " << target_pose.position.z << endl;        
 
-            // Plan the path
-            moveit::planning_interface::MoveGroupInterface::Plan my_plan;
-            bool success = (move_group.plan(my_plan) == moveit::planning_interface::MoveItErrorCode::SUCCESS);
-            if(success){move_group.execute(my_plan);}
-            // You can also use move_group.move(), which would plan and execute.
+            rrt_planner.setInitialNode(move_group.getCurrentJointValues());
 
-            ROS_INFO_NAMED("tutorial", "Visualizing plan 1 (pose goal) %s", success ? "" : "FAILED");
+            clock_t start, finish;
+            start = clock();
+            bool success = rrt_planner.plan();
+            finish = clock();
+            double time = (double)(finish-start)/CLOCKS_PER_SEC;
 
-            ROS_INFO_NAMED("tutorial", "Visualizing plan 1 as trajectory line");
-            visual_tools.publishAxisLabeled(target_pose, "pose1");
-            visual_tools.publishTrajectoryLine(my_plan.trajectory_, joint_model_group);
-            visual_tools.trigger();
+            if(success){
+                moveit::planning_interface::MoveGroupInterface::Plan my_plan;
+                rrt_planner.generatePlan(time, &my_plan);
+
+                cout << "Trying to get robot_state trajectory" << endl;
+                ROS_INFO_NAMED("tutorial", "Visualizing plan 1 as trajectory line");
+                visual_tools.publishAxisLabeled(target_pose, "pose1");
+                visual_tools.publishTrajectoryLine(my_plan.trajectory_, joint_model_group);
+                visual_tools.trigger();
+            }else{
+                cout << "After " << time << " secs of search, no available plan is found." << endl;
+            }
+
+            ROS_INFO_NAMED("Visualizing plan 1 (pose goal) %s", success ? "" : "FAILED");
         }else{
             ROS_ERROR("No target transform is received, please check the output of imgProcess.py");
         }
