@@ -1,8 +1,0 @@
-prefix=/usr/local
-
-Name: kuka_kr6_control
-Description: Description of kuka_kr6_control
-Version: 0.0.0
-Cflags: 
-Libs: -L${prefix}/lib 
-Requires: 

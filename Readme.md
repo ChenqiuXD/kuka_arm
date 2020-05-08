@@ -1,16 +1,70 @@
+# Motion planning simulation setup for kuka_kr6_r900sixx arm (rviz and gazebo)
 ## Overview
-This project is written for the graduation program in ZJU. One can use gazebo to simulate while utilising motion planning functions in MoveIt! package.
+This project is written for the graduation program in ZJU. One can use gazebo to simulate while utilising motion planning functions in MoveIt! package and test his own motion planning algorithm.
+
+## Packages and brief introduction
+src
+├── kuka_kr6_control
+├────── Controller for simulation in gazebo
+├── kuka_kr6_description
+├────── Urdf files for kuka_kr6 arm, camera, etc
+├── kuka_kr6_gazebo
+├────── Models and worlds file used in gazebo
+├── kuka_kr6r900sixx_moveit_config
+├────── Auto generated moveit_config_package by Moveit! using the urdf file in kuka_kr6_description
+├────── partly modified. Check for the tutorials about connecting rviz and gazebo for detailed description
+├── moveit_planning
+└────── Motion planning functions. Method list: 1 Moveit built-in functions; 2 rrt; 
 
 ## Usage
-To run the simulation, use the following two commands after catkin_make in the top level.
-roslaunch kuka_kr6_gazebo kuka_kr6_gazebo.launch
-roslaunch kuka_kr6r900sixx_moveit_config moveit_planning_execution.launch
+User currently has two options:
+1 - use moveit built-in motion planning function;
+2 - use RRT function written by arthur (unfinished);
+3 - Learned RRT (not started)
 
-You should see a kuka_arm spawned in an empty world with a kinect camera in the air representing by a red cylinder. To use the moveit's motion planning method, add 'motion planning' panel in rviz and update a new goal. Press the 'plan and execute' and observe that in both rviz and gazebo, the kuka arm moved with command. 
+# Moveit build-in functions
+After source devel file (if u do not know, check the internet) and use rosdep to install required packages, run the following command
+> roslaunch moveit_planning planning_scene.launch 
+The gazebo is not displayed to save computation resources. To display the gazebo window, run the command:
+> roslaunch moveit_planning planning_scene.launch showGazebo:=true
+The rviz and gazebo should be like:
+> rviz_no_planning.png
+> gazebo_no_plann.png
 
-To visulaize the image obtained from kinect, run
-rosrun image_view image_view image:='camera/color/image_raw'
+In the "Displays" panel in the left upper part of rviz, click the MotionPlanning->PlanningRequest->Query Goal State.
+Drag the interaction marker displayed on the end-effector and click "Plan and Execute" in the MotionPlanning panel.
+To see the path in loop or in trail, click Displays->MotionPlanning->Planned Path->Loop Animation || Show Trail
+The effect in rviz and gazebo should be:
+> rviz_planned.png
+> gazebo_planned.png
+
+# RRT functions written by arthur (not finished)
+After source and install required packages, run following command:
+> roslaunch moveit_planning planning_scene.launch useRRT:=true  
+To display gazebo:
+> roslaunch moveit_planning planning_scene.launch useRRT:=true showGazebo:=true
+
+Then run following command so as to detect the target object and publish tf message 
+> rosrun moveit_planning imgProcess.py 
+A window should appear: 
+(The target_pos might be jerking. Guess the problem lies in the model. Any solution would be most welcomed)
+> imgProcess.png
+
+Start the rrt functions and assign the maximum node counts and visualization options:
+visulization_options:
+├── 0 : no visulization
+├── 1 : visualise the vertices and edges
+└── 2 : visualise the generation of vertices per sec
+"maxIter" is an int and thus should not exceed int range.
+> rosrun moveit_planning rrtPlanner visual 1 maxIter 1000
+For visualization type 1 and maxIter 1000, the effect would be:
+> rrtPlanner_combined.png
+
+When terminal prompted that "Waiting to continue, Press 'next' to plan a path", press the 'next' button on the RvizVisualToolsGui panel in rviz.
+
+## Working Pipeline Explanation
+**TODO**
 
 ## TODO
-Use some algorithm to get the position of the target object
-Learn about the grasp interface of moveit.
+RRT is not finished therefore the outcome is incorrect
+Design the new algorithm and test it in this platform

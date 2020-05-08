@@ -106,6 +106,9 @@ int main(int argc, char** argv)
     // Initialize the obstacleAdder and rrtPlanner
     Obstacle_Adder obs_adder = Obstacle_Adder(nh, &planning_scene_interface);
     rrtPlanner rrt_planner = rrtPlanner(nh, kinematic_model, &planning_scene);
+    if(argc>1){
+        rrt_planner.getParamFromCommandline(argc, argv);
+    }
 
     // Start moveit visual tools
     namespace rvt = rviz_visual_tools;

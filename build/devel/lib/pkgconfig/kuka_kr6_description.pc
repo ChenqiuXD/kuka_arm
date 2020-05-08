@@ -1,8 +1,0 @@
-prefix=/home/davlee/ROS_ws/kuka_arm/src/build/devel
-
-Name: kuka_kr6_description
-Description: Description of kuka_kr6_description
-Version: 0.0.0
-Cflags: 
-Libs: -L${prefix}/lib 
-Requires: 

@@ -64,7 +64,7 @@ int main( int argc, char** argv )
       p.z = z;
 
       points.points.push_back(p);
-      line_strip.points.push_back(p);
+      // line_strip.points.push_back(p);
 
       // The line list needs two points for each line
       line_list.points.push_back(p);

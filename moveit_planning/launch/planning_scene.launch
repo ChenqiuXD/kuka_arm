@@ -1,13 +1,21 @@
 <launch>
     <param name="allow_trajectory_execution" value="true"/>
+    <arg name="useRRT" default="false"/>
+    <arg name="show_gazebo" default="false"/>
+
     <!-- Start the gazebo launch file. Set gui to false to stop gui of gazebo -->
     <include file="$(find kuka_kr6_gazebo)/launch/kuka_kr6_gazebo.launch">
         <arg name="use_sim_time" value="true"/>
-        <arg name="gui" value="false"/>     
+        <arg name="gui" value="$(arg show_gazebo)"/>     
     </include>
 
     <!-- Start rviz and motion planning group -->
     <include file="$(find kuka_kr6r900sixx_moveit_config)/launch/moveit_planning_execution.launch">
         <arg name="use_gui" value="false"/>
     </include>
+
+    <!-- Read in some RRT parameters -->
+    <group if="$(arg useRRT)">
+        <include file="$(find moveit_planning)/launch/rrtPlanner.launch"/>
+    </group>
 </launch>

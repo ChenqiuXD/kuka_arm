@@ -20,6 +20,9 @@ rrtPlanner::rrtPlanner(ros::NodeHandle& nh,
     this->jointModelGroup = kinematic_model->getJointModelGroup("manipulator");
     this->planningScene = planning_scene;
 
+    // Rviz display publisher
+    markerPub = nh.advertise<visualization_msgs::Marker>("visualization_marker", 10);
+
     // Get the target end-effector poses
     generateGraspPose(objPose);
 
@@ -55,6 +58,9 @@ rrtPlanner::rrtPlanner(ros::NodeHandle& nh,
     this->kinematicState->setToDefaultValues();
     this->jointModelGroup = kinematic_model->getJointModelGroup("manipulator");
     this->planningScene = planning_scene;
+
+    // Rviz display publisher
+    markerPub = nh.advertise<visualization_msgs::Marker>("visualization_marker", 10);
 
     // Get the joint limits from ros server
     int upper, lower;
@@ -100,17 +106,16 @@ void rrtPlanner::generateGraspPose(geometry_msgs::Pose objPose)
     if (found_ik){
         kinematicState->copyJointGroupPositions(jointModelGroup, joint_values);
         for (std::size_t i = 0; i < joint_names.size(); ++i){
-            ROS_INFO("Joint %s: %f", joint_names[i].c_str(), joint_values[i]);
+            ROS_INFO("Goal node's %s: %f", joint_names[i].c_str(), joint_values[i]);
         }
     }else{
         ROS_WARN("Did not find IK solution for current target pose");
     }
     
+    vector<int> jointInDegree;
     node ikGoalNode;
-    for(size_t i=0;i<JOINTNUM;i++){
-        ikGoalNode.jointAngles.push_back((int)(joint_values[i] * PI2DEG));
-        cout << "Goal node" << i <<"th joint is:" << ikGoalNode.jointAngles[i] << endl;
-    }
+    radianToDegree(joint_values, &jointInDegree);
+    ikGoalNode.jointAngles = jointInDegree;
     goalNodes.push_back(ikGoalNode);
 }
 
@@ -132,10 +137,9 @@ void rrtPlanner::setInitialNode(vector<double> jointPoses)
         cout << "Should be: " << JOINTNUM << ". But the input num is: " << jointPoses.size() << endl;
     }else{
         initialNode.id = 0;
-        for(size_t i=0;i<6;i++){
-            initialNode.jointAngles.push_back(jointPoses[i]*PI2DEG);
-            cout << "The " << i << "th joint value is: " << initialNode.jointAngles[i] << endl;
-        }
+        vector<int> jointInDegree;
+        radianToDegree(jointPoses, &jointInDegree);
+        initialNode.jointAngles = jointInDegree;
         ROS_INFO("Initial node set");
         cout << "Current node size is: " << rrtTree.size() << endl;
     }
@@ -150,6 +154,13 @@ void rrtPlanner::initialize()
     minGoalDist = float('inf');
     maxGoalDist = 0;
     success = false;
+    points.points.clear();
+    line_list.points.clear();
+}
+
+void rrtPlanner::setVisualParam(int visualType)
+{
+    this->enableVisual = visualType;
 }
 
 node rrtPlanner::sampleNode()
@@ -237,7 +248,75 @@ void rrtPlanner::extend(int id, node randNode)
             this->success = true;
         }
     }
+
+    if(this->enableVisual != VISUAL_TYPES::NO_VISUAL){
+        // Display the new node on rviz
+        drawNewNode(newNode);
+    }
+
     cout << "Current node counts is: " << rrtTree.size() << endl;
+}
+
+void rrtPlanner::drawNewNode(node newNode)
+{
+    // Initialize headers and other constant
+    points.header.frame_id = line_list.header.frame_id = "/world";
+    points.header.stamp = line_list.header.stamp = ros::Time::now();
+    points.action = line_list.action = visualization_msgs::Marker::ADD;
+    points.pose.orientation.w = line_list.pose.orientation.w = 1.0;
+    points.id = 0;
+    line_list.id = 1;
+    points.type = visualization_msgs::Marker::POINTS;
+    line_list.type = visualization_msgs::Marker::LINE_LIST;
+
+    // Size of points and width of lines.
+    points.scale.x = 0.002;
+    points.scale.y = 0.002;
+    line_list.scale.x = 0.001;
+
+    // Points are green
+    points.color.g = 1.0f;
+    points.color.a = 1.0;
+
+    // Line strip is blue
+    line_list.color.b = 1.0;
+    line_list.color.a = 1.0;   
+
+    geometry_msgs::Point newPoint;
+    geometry_msgs::Point prevPoint;
+    calcNodePose(newNode, &newPoint, &prevPoint);
+
+    points.points.push_back(newPoint);
+    line_list.points.push_back(newPoint);
+    line_list.points.push_back(prevPoint);
+
+    markerPub.publish(points);
+    ros::Rate sleep_time(1);
+    if(this->enableVisual == VISUAL_TYPES::VISUAL_STEP){
+        sleep_time.sleep();
+    }    
+    markerPub.publish(line_list);
+}
+
+void rrtPlanner::calcNodePose(node newNode, geometry_msgs::Point *newPose, geometry_msgs::Point *prevPose)
+{
+    vector<double> newJointAngles;
+    degreeToRadian(newNode.jointAngles, &newJointAngles);
+    kinematicState->setVariablePositions(newJointAngles);
+    const Eigen::Affine3d& newEndEffectorPose = kinematicState->getGlobalLinkTransform(END_EFFECTOR_NAME);
+    newPose->x = newEndEffectorPose.translation().x();
+    newPose->y = newEndEffectorPose.translation().y();
+    newPose->z = newEndEffectorPose.translation().z();
+    cout << "newPose is: " << newPose->x << " " << newPose->y << " " << newPose->z << endl;
+
+    vector<int> prevJointAngles = rrtTree[newNode.prevNodeid].jointAngles;
+    degreeToRadian(prevJointAngles, &newJointAngles);
+    kinematicState->setVariablePositions(newJointAngles);
+    const Eigen::Affine3d& prevEndEffectorPose = kinematicState->getGlobalLinkTransform(END_EFFECTOR_NAME);
+    prevPose->x = prevEndEffectorPose.translation().x();
+    prevPose->y = prevEndEffectorPose.translation().y();
+    prevPose->z = prevEndEffectorPose.translation().z();
+    cout << "prevPose is: " << prevPose->x << " " << prevPose->y << " " << prevPose->z << endl;
 }
 
 bool rrtPlanner::checkReachGoal(node newNode)
@@ -267,19 +346,20 @@ bool rrtPlanner::checkFeasbility(node nearestNode, node newNode)
 
     const std::vector<std::string>& joint_names = jointModelGroup->getVariableNames();
     std::vector<double> joint_values;
-    for(size_t i=0;i<JOINTNUM;i++){
-        joint_values.push_back(nearestNode.jointAngles[i]*DEG2PI);
-    }
+    degreeToRadian(nearestNode.jointAngles, &joint_values);
+    // for(size_t i=0;i<JOINTNUM;i++){
+    //     joint_values.push_back(nearestNode.jointAngles[i]*DEG2PI);
+    // }
 
-    robot_state::RobotState stateBetween(kinematicModel);
+    robot_state::RobotState stateInBetween(kinematicModel);
     bool isCollision = false;
     for(size_t i=0;i<FEASI_PIESCES_NUM;i++){
         for(size_t j=0;j<JOINTNUM;j++){
             joint_values[j] += (newNode.jointAngles[j] - nearestNode.jointAngles[j]) * DEG2PI / FEASI_PIESCES_NUM;
             cout << i << "th between nodes'  " << j << "th joint's angle: " << joint_values[j] << " is checking collision" << endl; 
         }
-        stateBetween.setVariablePositions(joint_names, joint_values);
-        planningScene->checkCollision(collision_request, collision_result, stateBetween);
+        stateInBetween.setVariablePositions(joint_names, joint_values);
+        planningScene->checkCollision(collision_request, collision_result, stateInBetween);
         if(collision_result.collision){
             isCollision = true;
             cout << i << "th test encounters a collision, node abandoned" << endl;
@@ -302,10 +382,8 @@ void rrtPlanner::findPath()
 
 void rrtPlanner::generatePlan(double time, moveit::planning_interface::MoveGroupInterface::Plan* my_plan)
 {
-    my_plan->planning_time_ = time;
-    
+    my_plan->planning_time_ = time;    
     moveit_msgs::RobotState robot_state;
-
     sensor_msgs::JointState joint_state;
 
     std_msgs::Header header;
@@ -322,7 +400,7 @@ void rrtPlanner::generatePlan(double time, moveit::planning_interface::MoveGroup
 
 bool rrtPlanner::plan()
 {
-    // Set some parameters i.e. this->success
+    // Set some parameters i.e. this->success...
     initialize();
 
     // The main plan process, return true if successfully planned.
@@ -341,6 +419,70 @@ bool rrtPlanner::plan()
     cout << "Minimum distance is: " << minGoalDist << endl;
     cout << "Maximum distance is: " << maxGoalDist << endl;
     return this->success;
+}
+
+void rrtPlanner::degreeToRadian(vector<int> degree, vector<double> *radian)
+{
+    if(degree.size()!=JOINTNUM){
+        ROS_ERROR("In function converting degree to radian, the size of vector does not conform with JOINTNUM");
+    }else{
+        if(radian->size()!=0){
+            radian->clear();
+        }
+        for(size_t i=0;i<JOINTNUM;i++){
+            radian->push_back(degree[i]*DEG2PI);
+        }
+    }
+}
+
+void rrtPlanner::radianToDegree(vector<double> radian, vector<int> *degree)
+{
+    if(radian.size()!=JOINTNUM){
+        ROS_ERROR("In function converting radian to degree, the size of vector does not conform with JOINTNUM");
+    }else{
+        if(degree->size()!=0){
+            degree->clear();
+        }
+        for(size_t i=0;i<JOINTNUM;i++){
+            degree->push_back(radian[i]*PI2DEG);
+        }
+    }
+}
+
+void rrtPlanner::getParamFromCommandline(int argc, char **argv)
+{
+    // Get the information from command line
+    ROS_INFO("Setting param as follows: ");
+    int i = 1;
+    while(i < argc){
+        string paramName = argv[i];
+        string paramValue = argv[i+1];
+        setParam(paramName, paramValue);
+        i += 2;
+    }
+}
+
+void rrtPlanner::setParam(string paramName, string paramValue)
+{
+    int value = atoi(paramValue.c_str());
+    if(paramName == "visual"){
+        cout << "Param visual type is set to: " << paramValue;
+        if(value==0 || value == 1 || value == 2){
+            switch(value){
+                case 0: this->enableVisual = VISUAL_TYPES::NO_VISUAL;   break;
+                case 1: this->enableVisual = VISUAL_TYPES::VISUAL_ALL;   break;
+                case 2: this->enableVisual = VISUAL_TYPES::VISUAL_STEP;   break;
+            }
+        }else{
+            ROS_ERROR("The input visual type parameter is out of range");
+        }
+    }else if( paramName == "maxIter" ){
+        if(value>0){
+            this->MAXITER = value;
+        }else{
+            ROS_ERROR("The input maxIter is minus");
+        }
+    }
 }
 
 // int main(int argc, char** argv)
