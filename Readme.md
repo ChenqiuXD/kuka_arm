@@ -22,15 +22,17 @@ User currently has two options:
 2 - use RRT function written by arthur (unfinished);  
 3 - Learned RRT (not started)  
 
-### Moveit build-in functions
+### 1 Moveit build-in functions
 After source devel file (if u do not know, check the internet) and use rosdep to install required packages, run the following command  
 > roslaunch moveit_planning planning_scene.launch  
+
 The gazebo is not displayed to save computation resources. To display the gazebo window, run the command:  
 > roslaunch moveit_planning planning_scene.launch showGazebo:=true  
   
 The rviz and gazebo should be like:  
 ![Alt text](https://github.com/ChenqiuXD/kuka_arm/blob/master/images/rviz_no_planning.png)  
 > rviz_no_planning.png  
+
 ![Alt text](https://github.com/ChenqiuXD/kuka_arm/blob/master/images/gazebo_no_plann.png)  
 > gazebo_no_plann.png  
 
@@ -40,10 +42,11 @@ To see the path in loop or in trail, click Displays->MotionPlanning->Planned Pat
 The effect in rviz and gazebo should be:  
 ![Alt text](https://github.com/ChenqiuXD/kuka_arm/blob/master/images/rviz_planned.png)  
 > rviz_planned.png  
+
 ![Alt text](https://github.com/ChenqiuXD/kuka_arm/blob/master/images/gazebo_planned.png)  
 > gazebo_planned.png  
 
-### RRT functions written by arthur (not finished)
+### 2 RRT functions written by arthur (not finished)
 After source and install required packages, run following command:  
 > roslaunch moveit_planning planning_scene.launch useRRT:=true  
 
@@ -71,6 +74,9 @@ For visualization type 1 and maxIter 1000, the effect would be:
 > rrtPlanner_combined.png  
 
 When terminal prompted that "Waiting to continue, Press 'next' to plan a path", press the 'next' button on the RvizVisualToolsGui panel in rviz.  
+
+### 3 Learnt RRT
+**TODO**
 
 ## Working Pipeline Explanation
 **TODO**
