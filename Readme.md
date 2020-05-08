@@ -1,4 +1,4 @@
-# Motion planning simulation setup for kuka_kr6_r900sixx arm (rviz and gazebo)
+# Motion planning simulation setup for kuka_kr6 arm
 ## Overview
 This project is written for the graduation program in ZJU. One can use gazebo to simulate while utilising motion planning functions in MoveIt! package and test his own motion planning algorithm.
 
@@ -22,7 +22,7 @@ User currently has two options:
 2 - use RRT function written by arthur (unfinished);
 3 - Learned RRT (not started)
 
-# Moveit build-in functions
+### Moveit build-in functions
 After source devel file (if u do not know, check the internet) and use rosdep to install required packages, run the following command
 > roslaunch moveit_planning planning_scene.launch 
 The gazebo is not displayed to save computation resources. To display the gazebo window, run the command:
@@ -38,9 +38,9 @@ The effect in rviz and gazebo should be:
 > rviz_planned.png
 > gazebo_planned.png
 
-# RRT functions written by arthur (not finished)
+### RRT functions written by arthur (not finished)
 After source and install required packages, run following command:
-> roslaunch moveit_planning planning_scene.launch useRRT:=true  
+> roslaunch moveit_planning planning_scene.launch useRRT:=true
 To display gazebo:
 > roslaunch moveit_planning planning_scene.launch useRRT:=true showGazebo:=true
 
