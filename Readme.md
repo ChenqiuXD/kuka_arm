@@ -1,6 +1,6 @@
 # Motion planning simulation setup for kuka_kr6 arm
 ## Overview
-This project is written for the graduation program in ZJU. One can use gazebo to simulate while utilising motion planning functions in MoveIt! package and test his own motion planning algorithm.
+This project is written for the graduation program in ZJU. It's a simulation setting for kuka_kr6r900sixx manipulator on gazebo and displayed by rviz. User can use function in Moveit! or write his own motion planning function and test them by this simulation setting.
 
 ## Packages and brief introduction
 src  
@@ -13,7 +13,8 @@ src
 ├── kuka_kr6r900sixx_moveit_config  
 ├────── Auto generated moveit_config_package by Moveit! using the urdf file in kuka_kr6_description.  
 ├────── Check for the tutorials about connecting rviz and gazebo for detailed description  
-└── moveit_planning	| Motion planning functions. Method list: 1 Moveit built-in functions; 2 rrt; 	|  
+├── moveit_planning
+└────── Motion planning functions. Method list: 1 Moveit built-in functions; 2 rrt;  
 
 ## Usage
 User currently has two options:  
@@ -45,11 +46,13 @@ The effect in rviz and gazebo should be:
 ### RRT functions written by arthur (not finished)
 After source and install required packages, run following command:  
 > roslaunch moveit_planning planning_scene.launch useRRT:=true  
+
 To display gazebo:  
 > roslaunch moveit_planning planning_scene.launch useRRT:=true showGazebo:=true  
 
 Then run following command so as to detect the target object and publish tf message   
-> rosrun moveit_planning imgProcess.py   
+> rosrun moveit_planning imgProcess.py 
+  
 A window should appear:   
 (The target_pos might be jerking. Guess the problem lies in the model. Any solution would be most welcomed)  
 ![Alt text](https://github.com/ChenqiuXD/kuka_arm/blob/master/images/imgProcess.png)  
@@ -62,6 +65,7 @@ visulization_options:
 └── 2 : visualise the generation of vertices per sec  
 "maxIter" is an int and thus should not exceed int range.  
 > rosrun moveit_planning rrtPlanner visual 1 maxIter 1000  
+
 For visualization type 1 and maxIter 1000, the effect would be:  
 ![Alt text](https://github.com/ChenqiuXD/kuka_arm/blob/master/images/rrtPlanner_before_next.png)  
 > rrtPlanner_combined.png  
