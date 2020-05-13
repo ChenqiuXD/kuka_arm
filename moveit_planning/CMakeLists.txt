@@ -216,13 +216,39 @@ include_directories(
 ## Add folders to be run by python nosetests
 # catkin_add_nosetests(test)
 
-add_executable(moveit_planner
-  include/moveit_planning/obstacle_adder.h
-  src/moveit_planner.cpp
+add_library(obstacle_adder
   src/obstacle_adder.cpp
+)
+add_dependencies(obstacle_adder ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
+target_link_libraries(obstacle_adder
+  ${catkin_LIBRARIES}
+)
+
+add_library(rrtPlanner
+  src/rrt_utils.cpp
+  src/rrtPlanner.cpp
+)
+add_dependencies(rrtPlanner ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
+target_link_libraries(rrtPlanner
+  ${catkin_LIBRARIES}
+)
+
+add_executable(moveit_planner
+  src/moveit_planner.cpp
 )
 add_dependencies(moveit_planner ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
 target_link_libraries(moveit_planner
+  obstacle_adder
+  ${catkin_LIBRARIES}
+)
+
+add_executable(moveit_planner_rrt
+  src/moveit_planner_rrt.cpp
+)
+add_dependencies(moveit_planner_rrt ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
+target_link_libraries(moveit_planner_rrt
+  obstacle_adder
+  rrtPlanner
   ${catkin_LIBRARIES}
 )
 
@@ -234,14 +260,3 @@ target_link_libraries(try
   ${catkin_LIBRARIES}
 )
 
-add_executable(rrtPlanner
-  src/obstacle_adder.cpp
-  src/rrtPlanner.cpp
-  src/moveit_planner_rrt.cpp
-  include/moveit_planning/rrtPlanner.h
-  include/moveit_planning/obstacle_adder.h
-)
-add_dependencies(rrtPlanner ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
-target_link_libraries(rrtPlanner
-  ${catkin_LIBRARIES}
-)

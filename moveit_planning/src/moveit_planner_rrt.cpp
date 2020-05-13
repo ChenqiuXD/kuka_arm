@@ -80,7 +80,7 @@ geometry_msgs::Pose setTarget(tf::StampedTransform targetTrans)
     // Get the translation
     target_pose.position.x = targetTrans.getOrigin().x();
     target_pose.position.y = targetTrans.getOrigin().y();
-    target_pose.position.z = targetTrans.getOrigin().z()+0.08;
+    target_pose.position.z = targetTrans.getOrigin().z()+0.04;
     return target_pose;
 }
 
@@ -135,16 +135,16 @@ int main(int argc, char** argv)
         if(pow(q[0],2) + pow(q[1],2) + pow(q[2],2) + pow(q[3],2) == 1){   
             ROS_INFO("Entering the planning mode");     
             geometry_msgs::Pose target_pose = setTarget(transform);
-            rrt_planner.generateGraspPose(target_pose);
+            rrt_planner.setGoalNodeFromPose(target_pose);
 
             ROS_INFO("The target_pose is received");
             cout << "The orientation are: " << target_pose.orientation.x << " " << target_pose.orientation.y << " " << target_pose.orientation.z << " " << target_pose.orientation.w << endl;
             cout << "The translations are: " << target_pose.position.x << " " << target_pose.position.y << " " << target_pose.position.z << endl;        
 
-            // rrt_planner.setInitialNode(move_group.getCurrentJointValues());
+            rrt_planner.setInitialNode(move_group.getCurrentJointValues());
             // Only for debugging, comment this line when running
-            vector<double> jointPosition{0,0.9,0,0,0,0};
-            rrt_planner.setInitialNode(jointPosition);
+            // vector<double> jointPosition{0,0.9,0,0,0,0};
+            // rrt_planner.setInitialNode(jointPosition);
 
             clock_t start, finish;
             start = clock();
@@ -154,7 +154,7 @@ int main(int argc, char** argv)
 
             if(success){
                 moveit::planning_interface::MoveGroupInterface::Plan my_plan;
-                rrt_planner.generatePlan(time, &my_plan);
+                rrt_planner.generatePlanMsg(time, &my_plan);
 
                 cout << "Trying to get robot_state trajectory" << endl;
                 ROS_INFO_NAMED("tutorial", "Visualizing plan 1 as trajectory line");

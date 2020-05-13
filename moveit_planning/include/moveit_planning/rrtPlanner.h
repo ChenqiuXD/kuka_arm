@@ -2,18 +2,20 @@
 #define RRTPLANNER_H
 
 #include <ros/ros.h>
-#include <visualization_msgs/Marker.h>
 #include <vector>
-#include <geometry_msgs/Pose.h>
+#include <Eigen/Geometry>
+#include <Eigen/Core>
+
 #include <moveit/collision_detection/collision_common.h>
 #include <moveit/robot_model_loader/robot_model_loader.h>
 #include <moveit/robot_model/robot_model.h>
 #include <moveit/robot_state/robot_state.h>
-#include <moveit_msgs/RobotState.h>
 #include <moveit/planning_scene_monitor/planning_scene_monitor.h>
 #include <moveit/move_group_interface/move_group_interface.h>
-#include <Eigen/Geometry>
-#include <Eigen/Core>
+
+#include <geometry_msgs/Pose.h>
+#include <visualization_msgs/Marker.h>
+#include <moveit_msgs/RobotState.h>
 
 using namespace std;
 
@@ -31,13 +33,12 @@ struct node
 class rrtPlanner
 {
 public:
-    rrtPlanner(ros::NodeHandle& nh, geometry_msgs::Pose objPose,
-               robot_model::RobotModelPtr kinematic_model,
-               planning_scene_monitor::PlanningSceneMonitorPtr planning_scene_monitor_);
     rrtPlanner(ros::NodeHandle& nh,
                robot_model::RobotModelPtr kinematic_model,
                planning_scene_monitor::PlanningSceneMonitorPtr planning_scene_monitor_);
-    void generateGraspPose(geometry_msgs::Pose objPose);
+    void setGoalNodeFromPose(geometry_msgs::Pose objPose);
+    void setGoalNode(vector<int> jointPosition);
+    void setGoalNode(vector<double> jointPosition);
     void setInitialNode(vector<int> jointPoses);
     void setInitialNode(vector<double> jointPoses);
     void initialize();
@@ -49,11 +50,12 @@ public:
     double calcDist(node a, node b);
     void extend(int id, node randNode);
     void drawNewNode(node newNode);
+    void drawPlan();
     void calcNodePose(node newNode, geometry_msgs::Point *nodePose);
     bool checkReachGoal(node newNode);
     bool checkFeasbility(node nearestNode, node newNode);
     void findPath();
-    void generatePlan(double time, moveit::planning_interface::MoveGroupInterface::Plan* my_plan);
+    void generatePlanMsg(double time, moveit::planning_interface::MoveGroupInterface::Plan* my_plan);
     bool plan();
 
     // util functions
@@ -63,14 +65,14 @@ public:
     void setParam(string paramName, string paramValue);
 
     // Angle tolerance per joint
-    double GOALTOLERANCE = 3;
+    double GOALTOLERANCE = 6;
     // STEP : Used in extend, determine the extending step
     double STEP = 0.5;
     // FEASI_PIESCES_NUM : Used in checkFeasibility, determine the number of pieces
     // between nearestNode and newNode to be check collision
-    int FEASI_PIESCES_NUM = 1; 
+    int FEASI_PIESCES_NUM = 3; 
     // In plan, the maximum of extend iteration
-    int MAXITER = 4500;
+    int MAXITER = 2000;
     // Name of the end-effctor
     string END_EFFECTOR_NAME = "tool0";
 
@@ -82,6 +84,8 @@ public:
     ros::Publisher markerPub;
     visualization_msgs::Marker points;
     visualization_msgs::Marker line_list;
+    visualization_msgs::Marker pathVertices;
+    visualization_msgs::Marker pathEdges;
 
     double minGoalDist = float('inf');
     double maxGoalDist = 0;
