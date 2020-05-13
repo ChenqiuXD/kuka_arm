@@ -226,22 +226,6 @@ target_link_libraries(moveit_planner
   ${catkin_LIBRARIES}
 )
 
-add_executable(try_move
-  src/try_move.cpp
-)
-add_dependencies(try_move ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
-target_link_libraries(try_move
-  ${catkin_LIBRARIES}
-)
-
-add_executable(ik
-  src/ik.cpp
-)
-add_dependencies(ik ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
-target_link_libraries(ik
-  ${catkin_LIBRARIES}
-)
-
 add_executable(try
   src/try.cpp
 )

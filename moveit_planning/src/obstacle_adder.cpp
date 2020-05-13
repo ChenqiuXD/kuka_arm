@@ -15,11 +15,11 @@ using namespace std;
 Obstacle_Adder::~Obstacle_Adder()
 {;}
 
-Obstacle_Adder::Obstacle_Adder(ros::NodeHandle& nh, moveit::planning_interface::PlanningSceneInterface* pli) : nh(nh)
+Obstacle_Adder::Obstacle_Adder(ros::NodeHandle& nh) : nh(nh)
 {
-    this->plan_scene = pli;
     this->obs_names = {"wooden_case::base", "box::link"};;
     this->link_states_sub = nh.subscribe("/gazebo/link_states", 1, &Obstacle_Adder::obs_callback, this);
+    this->obstacle_pub = nh.advertise<moveit_msgs::PlanningScene>("planning_scene", 1);
 }
 
 void Obstacle_Adder::obs_callback(const gazebo_msgs::LinkStates::ConstPtr &msg)
@@ -42,6 +42,7 @@ void Obstacle_Adder::obs_callback(const gazebo_msgs::LinkStates::ConstPtr &msg)
 
 void Obstacle_Adder::add_obstacles()
 {
+    std::vector<moveit_msgs::CollisionObject> collision_objects;
     for(int i = 0;i < this->obs_names.size();i++){
         string element_name = obs_names[i];
         moveit_msgs::CollisionObject collision_object;
@@ -97,44 +98,30 @@ void Obstacle_Adder::add_obstacles()
             collision_object.primitive_poses.push_back(p);
 
             collision_object.operation = collision_object.ADD;
-        }
-        // }else if(element_name=="box::link"){            
-        //     ROS_INFO("Detected unit_box");
-        //     collision_object.id = "box::link";
+        }else if(element_name=="box::link"){            
+            ROS_INFO("Detected unit_box");
+            collision_object.id = "box::link";
             
-        //     shape_msgs::SolidPrimitive primitive;
-        //     primitive.type = primitive.BOX;
-        //     primitive.dimensions.resize(3);
-        //     primitive.dimensions[0] = 0.08;
-        //     primitive.dimensions[1] = 0.08;
-        //     primitive.dimensions[2] = 0.08;
+            shape_msgs::SolidPrimitive primitive;
+            primitive.type = primitive.BOX;
+            primitive.dimensions.resize(3);
+            primitive.dimensions[0] = 0.08;
+            primitive.dimensions[1] = 0.08;
+            primitive.dimensions[2] = 0.08;
 
-        //     collision_object.primitives.push_back(primitive);
-        //     collision_object.primitive_poses.push_back(this->obs_poses[element_name]);
-        //     collision_object.operation = collision_object.ADD;
-        // }
-        else{
+            collision_object.primitives.push_back(primitive);
+            collision_object.primitive_poses.push_back(this->obs_poses[element_name]);
+            collision_object.operation = collision_object.ADD;
+        }else{
             continue;
         }
-
-        std::vector<moveit_msgs::CollisionObject> collision_objects;
         collision_objects.push_back(collision_object);
-        (*this->plan_scene).addCollisionObjects(collision_objects);
     }
+    moveit_msgs::PlanningScene planning_scene_msg;
+    planning_scene_msg.name = "motion_planning_scene";
+    planning_scene_msg.world.collision_objects = collision_objects;
+    planning_scene_msg.is_diff = true;
+    this->obstacle_pub.publish(planning_scene_msg);
+    ros::WallDuration sleep_t(0.5);
+    sleep_t.sleep();
 }
-
-// int main(int argc, char** argv)
-// {
-//     ros::init(argc, argv, "pose_pub");
-//     ros::NodeHandle nh;
-//     Obstacle_Adder obs_adder = Obstacle_Adder(nh);
-    
-//     ros::Rate loop_rate(10);
-//     while(ros::ok()){
-//         cout << "The pose in obstacles are: " << obs_adder.obs_poses["wooden_case::base"] << endl;
-//         ros::spinOnce();
-//         loop_rate.sleep();
-//     }
-
-//     return 0;
-// }

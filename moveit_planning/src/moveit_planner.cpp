@@ -93,12 +93,11 @@ int main(int argc, char** argv)
     // Initialize moveit relevent variables
     static const std::string PLANNING_GROUP = "manipulator";
     moveit::planning_interface::MoveGroupInterface move_group(PLANNING_GROUP);
-    moveit::planning_interface::PlanningSceneInterface planning_scene_interface;
     const robot_state::JointModelGroup* joint_model_group =
         move_group.getCurrentState()->getJointModelGroup(PLANNING_GROUP);
 
     // Initialize the obstacle adder to add obstacle from gazebo
-    Obstacle_Adder obs_adder = Obstacle_Adder(nh, &planning_scene_interface);
+    Obstacle_Adder obs_adder = Obstacle_Adder(nh);
 
     // Start moveit visual tools
     namespace rvt = rviz_visual_tools;

@@ -11,14 +11,14 @@ using namespace std;
 rrtPlanner::rrtPlanner(ros::NodeHandle& nh,
                        geometry_msgs::Pose objPose,
                        robot_model::RobotModelPtr kinematic_model,
-                       planning_scene::PlanningScene* planning_scene) : nh(nh)
+                       planning_scene_monitor::PlanningSceneMonitorPtr planning_scene_monitor_) : nh(nh)
 {
     this->kinematicModel = kinematic_model;
     robot_state::RobotStatePtr kinematic_state(new robot_state::RobotState(kinematic_model));
     this->kinematicState = kinematic_state;
     this->kinematicState->setToDefaultValues();
     this->jointModelGroup = kinematic_model->getJointModelGroup("manipulator");
-    this->planningScene = planning_scene;
+    this->planningSceneMonitor_ = planning_scene_monitor_;
 
     // Rviz display publisher
     markerPub = nh.advertise<visualization_msgs::Marker>("visualization_marker", 10);
@@ -50,14 +50,14 @@ rrtPlanner::rrtPlanner(ros::NodeHandle& nh,
 
 rrtPlanner::rrtPlanner(ros::NodeHandle& nh,
             robot_model::RobotModelPtr kinematic_model,
-            planning_scene::PlanningScene* planning_scene) : nh(nh)
+            planning_scene_monitor::PlanningSceneMonitorPtr planning_scene_monitor_) : nh(nh)
 {
     this->kinematicModel = kinematic_model;
     robot_state::RobotStatePtr kinematic_state(new robot_state::RobotState(kinematic_model));
     this->kinematicState = kinematic_state;
     this->kinematicState->setToDefaultValues();
     this->jointModelGroup = kinematic_model->getJointModelGroup("manipulator");
-    this->planningScene = planning_scene;
+    this->planningSceneMonitor_ = planning_scene_monitor_;
 
     // Rviz display publisher
     markerPub = nh.advertise<visualization_msgs::Marker>("visualization_marker", 10);
@@ -154,114 +154,16 @@ void rrtPlanner::initialize()
     minGoalDist = float('inf');
     maxGoalDist = 0;
     success = false;
+
+    initrrtVisual();
+    initPathVisual();
+}
+
+void rrtPlanner::initrrtVisual()
+{
     points.points.clear();
     line_list.points.clear();
-}
 
-void rrtPlanner::setVisualParam(int visualType)
-{
-    this->enableVisual = visualType;
-}
-
-node rrtPlanner::sampleNode()
-{
-    // Randomly sample a node in the configuration space
-    int jointAng;
-    node randNode;
-    randNode.prevNodeid = -1;
-    srand(time(NULL));
-    random_device rd;
-    for(int i=0; i<JOINTNUM; i++){
-        jointAng = rd() % (jointUpperLimits[i]-jointLowerLimits[i]) + jointLowerLimits[i];
-        randNode.jointAngles.push_back(jointAng);
-        cout << "The " << i << "th joint's sampled node is: " << randNode.jointAngles[i] << endl;
-    }
-    return randNode;
-}
-
-int rrtPlanner::findNearest(node randNode)
-{
-    // Use brute-force method to find the nearest node among the tree
-    // return the id of that nearest node
-    double dist, minDist=float('inf');
-    int minid = -1;
-    for(int i=0;i<rrtTree.size();i++){
-        dist = calcDist(rrtTree[i], randNode); 
-        if(dist<minDist){
-            minDist = dist;
-            minid = i;
-        }
-    }
-    cout << "The minid is: " << minid << " and the min dist is: " << minDist <<endl;
-    return minid;
-}
-
-double rrtPlanner::calcDist(node a, node b)
-{
-    double result, distance = 0;
-    double angleDist = 0;
-    for(int i=0;i<JOINTNUM;i++){
-        // NOTE that here you can divide the minus with the (UpperLimit - LowerLimit)
-        angleDist = (a.jointAngles[i] - b.jointAngles[i]) / (1);
-        distance += pow(angleDist,2);
-    }
-    result = sqrt(distance);
-    return result;
-}
-
-void rrtPlanner::extend(int id, node randNode)
-{
-    ROS_INFO("Entering extend function");
-    // Check the feasibility and extend the node
-    if(id==-1){
-        ROS_ERROR("Nearest node's id is -1, check the size of rrtTree: %d", (int)rrtTree.size());
-        return;
-    }
-    node nearestNode = rrtTree[id];
-    double distance = calcDist(nearestNode, randNode);
-    node newNode;
-
-    double step = STEP*JOINTNUM;
-    if(distance<=step){
-        newNode = randNode;
-    }else{
-        for(int i=0;i<JOINTNUM;i++){
-            // The new node lies between the nearestNode and the randNode
-            // with STEP*JOINTNUM distance from nearest
-            int newAngle = int(nearestNode.jointAngles[i] + (randNode.jointAngles[i]-nearestNode.jointAngles[i])*step/distance);
-            newNode.jointAngles.push_back(newAngle);
-            cout << "The new angle is: " << newAngle << endl;
-        }
-    }
-
-    for(size_t i=0;i<JOINTNUM;i++){
-        cout << "Nearest Node " << i << "th angle is: " <<nearestNode.jointAngles[i] << endl;
-    }
-
-    bool isFeasible = checkFeasbility(nearestNode, newNode);
-    if(isFeasible){
-        bool isReachGoal = checkReachGoal(newNode);
-        newNode.prevNodeid = nearestNode.id;
-        newNode.id = rrtTree.size();
-        rrtTree.push_back(newNode);
-        if(isReachGoal){
-            this->success = true;
-        }
-    }
-
-    if(this->enableVisual != VISUAL_TYPES::NO_VISUAL){
-        // Display the new node on rviz
-        drawNewNode(newNode);
-    }
-
-    cout << "Current node counts is: " << rrtTree.size() << endl;
-}
-
-void rrtPlanner::drawNewNode(node newNode)
-{
-    // Initialize headers and other constant
-    points.header.frame_id = line_list.header.frame_id = "/world";
-    points.header.stamp = line_list.header.stamp = ros::Time::now();
     points.action = line_list.action = visualization_msgs::Marker::ADD;
     points.pose.orientation.w = line_list.pose.orientation.w = 1.0;
     points.id = 0;
@@ -281,42 +183,135 @@ void rrtPlanner::drawNewNode(node newNode)
     // Line strip is blue
     line_list.color.b = 1.0;
     line_list.color.a = 1.0;   
+}
+
+void rrtPlanner::initPathVisual()
+{
+    ;
+}
+
+void rrtPlanner::setVisualParam(int visualType)
+{
+    this->enableVisual = visualType;
+}
+
+node rrtPlanner::sampleNode()
+{
+    // Randomly sample a node in the configuration space
+    int jointAng;
+    node randNode;
+    randNode.prevNodeid = -1;
+    srand(time(NULL));
+    random_device rd;
+    for(int i=0; i<JOINTNUM; i++){
+        jointAng = rd() % (jointUpperLimits[i]-jointLowerLimits[i]) + jointLowerLimits[i];
+        randNode.jointAngles.push_back(jointAng);
+    }
+    return randNode;
+}
+
+int rrtPlanner::findNearest(node randNode)
+{
+    // Use brute-force method to find the nearest node among the tree
+    // return the id of that nearest node
+    double dist, minDist=float('inf');
+    int minid = -1;
+    for(int i=0;i<rrtTree.size();i++){
+        dist = calcDist(rrtTree[i], randNode); 
+        if(dist<minDist){
+            minDist = dist;
+            minid = i;
+        }
+    }
+    return minid;
+}
+
+double rrtPlanner::calcDist(node a, node b)
+{
+    double result, distance = 0;
+    double angleDist = 0;
+    for(int i=0;i<JOINTNUM;i++){
+        // NOTE that here you can divide the minus with the (UpperLimit - LowerLimit)
+        angleDist = (a.jointAngles[i] - b.jointAngles[i]) / (1);
+        distance += pow(angleDist,2);
+    }
+    result = sqrt(distance);
+    return result;
+}
+
+void rrtPlanner::extend(int id, node randNode)
+{
+    // Check the feasibility and extend the node
+    if(id==-1){
+        ROS_ERROR("Nearest node's id is -1, check the size of rrtTree: %d", (int)rrtTree.size());
+        return;
+    }
+    node nearestNode = rrtTree[id];
+    double distance = calcDist(nearestNode, randNode);
+    node newNode;
+
+    double step = STEP*JOINTNUM;
+    if(distance<=step){
+        newNode = randNode;
+    }else{
+        for(int i=0;i<JOINTNUM;i++){
+            // The new node lies between the nearestNode and the randNode
+            // with STEP*JOINTNUM distance from nearest
+            int newAngle = int(nearestNode.jointAngles[i] + (randNode.jointAngles[i]-nearestNode.jointAngles[i])*step/distance);
+            newNode.jointAngles.push_back(newAngle);
+        }
+    }
+
+    bool isFeasible = checkFeasbility(nearestNode, newNode);
+    if(isFeasible){
+        bool isReachGoal = checkReachGoal(newNode);
+        newNode.prevNodeid = nearestNode.id;
+        newNode.id = rrtTree.size();
+        rrtTree.push_back(newNode);
+        if(isReachGoal){
+            this->success = true;
+        }
+
+        if(this->enableVisual != VISUAL_TYPES::NO_VISUAL){
+            drawNewNode(newNode);
+        }
+    }
+
+    cout << "Current node counts is: " << rrtTree.size() << endl;
+}
+
+void rrtPlanner::drawNewNode(node newNode)
+{
+    // Initialize headers and other constant
+    points.header.frame_id = line_list.header.frame_id = "/world";
+    points.header.stamp = line_list.header.stamp = ros::Time::now();
 
     geometry_msgs::Point newPoint;
     geometry_msgs::Point prevPoint;
-    calcNodePose(newNode, &newPoint, &prevPoint);
+    calcNodePose(newNode, &newPoint);
+    calcNodePose(rrtTree[newNode.prevNodeid], &prevPoint);
 
     points.points.push_back(newPoint);
     line_list.points.push_back(newPoint);
     line_list.points.push_back(prevPoint);
 
     markerPub.publish(points);
-    ros::Rate sleep_time(1);
+    ros::WallDuration sleep_t(1);
     if(this->enableVisual == VISUAL_TYPES::VISUAL_STEP){
-        sleep_time.sleep();
+        sleep_t.sleep();
     }    
     markerPub.publish(line_list);
 }
 
-void rrtPlanner::calcNodePose(node newNode, geometry_msgs::Point *newPose, geometry_msgs::Point *prevPose)
+void rrtPlanner::calcNodePose(node newNode, geometry_msgs::Point *nodePose)
 {
     vector<double> newJointAngles;
     degreeToRadian(newNode.jointAngles, &newJointAngles);
     kinematicState->setVariablePositions(newJointAngles);
     const Eigen::Affine3d& newEndEffectorPose = kinematicState->getGlobalLinkTransform(END_EFFECTOR_NAME);
-    newPose->x = newEndEffectorPose.translation().x();
-    newPose->y = newEndEffectorPose.translation().y();
-    newPose->z = newEndEffectorPose.translation().z();
-    cout << "newPose is: " << newPose->x << " " << newPose->y << " " << newPose->z << endl;
-
-    vector<int> prevJointAngles = rrtTree[newNode.prevNodeid].jointAngles;
-    degreeToRadian(prevJointAngles, &newJointAngles);
-    kinematicState->setVariablePositions(newJointAngles);
-    const Eigen::Affine3d& prevEndEffectorPose = kinematicState->getGlobalLinkTransform(END_EFFECTOR_NAME);
-    prevPose->x = prevEndEffectorPose.translation().x();
-    prevPose->y = prevEndEffectorPose.translation().y();
-    prevPose->z = prevEndEffectorPose.translation().z();
-    cout << "prevPose is: " << prevPose->x << " " << prevPose->y << " " << prevPose->z << endl;
+    nodePose->x = newEndEffectorPose.translation().x();
+    nodePose->y = newEndEffectorPose.translation().y();
+    nodePose->z = newEndEffectorPose.translation().z();
 }
 
 bool rrtPlanner::checkReachGoal(node newNode)
@@ -328,7 +323,6 @@ bool rrtPlanner::checkReachGoal(node newNode)
         distance = calcDist(newNode, goalNodes[i]);
         if(distance < minGoalDist){minGoalDist = distance;}
         if(distance > maxGoalDist){maxGoalDist = distance;}
-        cout << "New node distance to goal is: " << distance << endl;
         if(distance<=GOALTOLERANCE*JOINTNUM){
             result = true;
             break;
@@ -339,27 +333,29 @@ bool rrtPlanner::checkReachGoal(node newNode)
 
 bool rrtPlanner::checkFeasbility(node nearestNode, node newNode)
 {
-    ROS_INFO("Entering checkFeasibility function");
     // Check the straight line between the nearest node and the new node.
     collision_detection::CollisionRequest collision_request;
     collision_detection::CollisionResult collision_result;
+    collision_result.clear();
 
     const std::vector<std::string>& joint_names = jointModelGroup->getVariableNames();
     std::vector<double> joint_values;
     degreeToRadian(nearestNode.jointAngles, &joint_values);
-    // for(size_t i=0;i<JOINTNUM;i++){
-    //     joint_values.push_back(nearestNode.jointAngles[i]*DEG2PI);
-    // }
+
+    const std::string PLANNING_SCENE_SERVICE = "get_planning_scene";   
+    planningSceneMonitor_->requestPlanningSceneState(PLANNING_SCENE_SERVICE);
+    planning_scene_monitor::LockedPlanningSceneRW planningSceneRW(planningSceneMonitor_);
+    planningSceneRW->getCurrentStateNonConst().update();
 
     robot_state::RobotState stateInBetween(kinematicModel);
     bool isCollision = false;
     for(size_t i=0;i<FEASI_PIESCES_NUM;i++){
         for(size_t j=0;j<JOINTNUM;j++){
             joint_values[j] += (newNode.jointAngles[j] - nearestNode.jointAngles[j]) * DEG2PI / FEASI_PIESCES_NUM;
-            cout << i << "th between nodes'  " << j << "th joint's angle: " << joint_values[j] << " is checking collision" << endl; 
+            // cout << i << "th between nodes'  " << j << "th joint's angle: " << joint_values[j] << " is checking collision" << endl; 
         }
         stateInBetween.setVariablePositions(joint_names, joint_values);
-        planningScene->checkCollision(collision_request, collision_result, stateInBetween);
+        planningSceneRW->checkCollision(collision_request, collision_result, stateInBetween);
         if(collision_result.collision){
             isCollision = true;
             cout << i << "th test encounters a collision, node abandoned" << endl;
@@ -484,28 +480,3 @@ void rrtPlanner::setParam(string paramName, string paramValue)
         }
     }
 }
-
-// int main(int argc, char** argv)
-// {
-//     // For test
-//     ros::init(argc, argv, "pos_listener");
-//     ros::NodeHandle nh;
-    
-//     robot_model_loader::RobotModelLoader robot_model_loader("robot_description");
-//     robot_model::RobotModelPtr kinematic_model = robot_model_loader.getModel();
-//     planning_scene::PlanningScene planning_scene(kinematic_model);
-//     ROS_INFO("Model frame: %s", kinematic_model->getModelFrame().c_str());
-
-//     geometry_msgs::Pose pose;
-//     pose.orientation.x = 0.69867;
-//     pose.orientation.y = 0.70328;
-//     pose.orientation.z = 0.0860347;
-//     pose.orientation.w = 0.0992733;
-//     pose.position.x = 0.608802;
-//     pose.position.y = 0.105058;
-//     pose.position.z = 0.408134;
-
-//     rrtPlanner planner = rrtPlanner(nh, pose, kinematic_model, &planning_scene);
-//     bool success = planner.plan();
-//     ROS_INFO_NAMED("rrtPlanner", " planned %s", success ? "SUCCESFULLY" : "FAILED");
-// }

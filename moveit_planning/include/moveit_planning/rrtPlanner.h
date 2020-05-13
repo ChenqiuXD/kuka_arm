@@ -10,7 +10,7 @@
 #include <moveit/robot_model/robot_model.h>
 #include <moveit/robot_state/robot_state.h>
 #include <moveit_msgs/RobotState.h>
-#include <moveit/planning_scene/planning_scene.h>
+#include <moveit/planning_scene_monitor/planning_scene_monitor.h>
 #include <moveit/move_group_interface/move_group_interface.h>
 #include <Eigen/Geometry>
 #include <Eigen/Core>
@@ -33,21 +33,23 @@ class rrtPlanner
 public:
     rrtPlanner(ros::NodeHandle& nh, geometry_msgs::Pose objPose,
                robot_model::RobotModelPtr kinematic_model,
-               planning_scene::PlanningScene* planning_scene);
+               planning_scene_monitor::PlanningSceneMonitorPtr planning_scene_monitor_);
     rrtPlanner(ros::NodeHandle& nh,
                robot_model::RobotModelPtr kinematic_model,
-               planning_scene::PlanningScene* planning_scene);
+               planning_scene_monitor::PlanningSceneMonitorPtr planning_scene_monitor_);
     void generateGraspPose(geometry_msgs::Pose objPose);
     void setInitialNode(vector<int> jointPoses);
     void setInitialNode(vector<double> jointPoses);
     void initialize();
+    void initrrtVisual();
+    void initPathVisual();
     void setVisualParam(int visualType);
     node sampleNode();
     int findNearest(node randNode);
     double calcDist(node a, node b);
     void extend(int id, node randNode);
     void drawNewNode(node newNode);
-    void calcNodePose(node newNode, geometry_msgs::Point *newPose, geometry_msgs::Point *prevPose);
+    void calcNodePose(node newNode, geometry_msgs::Point *nodePose);
     bool checkReachGoal(node newNode);
     bool checkFeasbility(node nearestNode, node newNode);
     void findPath();
@@ -66,16 +68,16 @@ public:
     double STEP = 0.5;
     // FEASI_PIESCES_NUM : Used in checkFeasibility, determine the number of pieces
     // between nearestNode and newNode to be check collision
-    int FEASI_PIESCES_NUM = 4; 
+    int FEASI_PIESCES_NUM = 1; 
     // In plan, the maximum of extend iteration
-    int MAXITER = 5000;
+    int MAXITER = 4500;
     // Name of the end-effctor
     string END_EFFECTOR_NAME = "tool0";
 
     robot_model::RobotModelPtr kinematicModel;
     robot_state::RobotStatePtr kinematicState;
     robot_state::JointModelGroup* jointModelGroup;
-    planning_scene::PlanningScene* planningScene;
+    planning_scene_monitor::PlanningSceneMonitorPtr planningSceneMonitor_;
     ros::NodeHandle& nh;
     ros::Publisher markerPub;
     visualization_msgs::Marker points;
@@ -85,7 +87,7 @@ public:
     double maxGoalDist = 0;
     bool success = false;
     node initialNode;
-    int enableVisual;
+    int enableVisual = 1;
     enum VISUAL_TYPES { NO_VISUAL, VISUAL_ALL, VISUAL_STEP };
     vector<node> rrtTree;
     vector<node> path;

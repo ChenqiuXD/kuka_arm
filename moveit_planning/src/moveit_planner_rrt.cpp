@@ -95,17 +95,19 @@ int main(int argc, char** argv)
     // Initialize moveit relevent variables
     static const std::string PLANNING_GROUP = "manipulator";
     moveit::planning_interface::MoveGroupInterface move_group(PLANNING_GROUP);
-    moveit::planning_interface::PlanningSceneInterface planning_scene_interface;
     const robot_state::JointModelGroup* joint_model_group =
         move_group.getCurrentState()->getJointModelGroup(PLANNING_GROUP);
 
-    robot_model_loader::RobotModelLoader robot_model_loader("robot_description");
-    robot_model::RobotModelPtr kinematic_model = robot_model_loader.getModel();
-    planning_scene::PlanningScene planning_scene(kinematic_model);
+    // robot_model_loader::RobotModelLoader robot_model_loader("robot_description");
+    robot_model_loader::RobotModelLoaderPtr robot_model_loader_;
+    robot_model_loader_.reset(new robot_model_loader::RobotModelLoader("robot_description"));
+    robot_model::RobotModelPtr kinematic_model = robot_model_loader_->getModel();
+    planning_scene_monitor::PlanningSceneMonitorPtr planning_scene_monitor_;
+    planning_scene_monitor_.reset(new planning_scene_monitor::PlanningSceneMonitor(robot_model_loader_));
 
     // Initialize the obstacleAdder and rrtPlanner
-    Obstacle_Adder obs_adder = Obstacle_Adder(nh, &planning_scene_interface);
-    rrtPlanner rrt_planner = rrtPlanner(nh, kinematic_model, &planning_scene);
+    Obstacle_Adder obs_adder = Obstacle_Adder(nh);
+    rrtPlanner rrt_planner = rrtPlanner(nh, kinematic_model, planning_scene_monitor_);
     if(argc>1){
         rrt_planner.getParamFromCommandline(argc, argv);
     }
@@ -121,7 +123,6 @@ int main(int argc, char** argv)
     ROS_INFO("Currently running moveit planning");
     while(ros::ok()){
         // Refresh the obstacles for next plan
-        // planning_scene_interface.world.collision_objects.clear();
         obs_adder.add_obstacles();
 
         visual_tools.prompt("Press 'next' to plan a path");
@@ -140,7 +141,10 @@ int main(int argc, char** argv)
             cout << "The orientation are: " << target_pose.orientation.x << " " << target_pose.orientation.y << " " << target_pose.orientation.z << " " << target_pose.orientation.w << endl;
             cout << "The translations are: " << target_pose.position.x << " " << target_pose.position.y << " " << target_pose.position.z << endl;        
 
-            rrt_planner.setInitialNode(move_group.getCurrentJointValues());
+            // rrt_planner.setInitialNode(move_group.getCurrentJointValues());
+            // Only for debugging, comment this line when running
+            vector<double> jointPosition{0,0.9,0,0,0,0};
+            rrt_planner.setInitialNode(jointPosition);
 
             clock_t start, finish;
             start = clock();
