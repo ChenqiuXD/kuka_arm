@@ -77,7 +77,9 @@ For visualization type 1 and maxIter 1000, the effect would be:
 ![Alt text](https://github.com/ChenqiuXD/kuka_arm/blob/master/images/rrtPlanner_before_next.png)  
 > rrtPlanner_combined.png  
 
-
+For maxIter 10000, the search result is as follows  
+![Alt text](https://github.com/ChenqiuXD/kuka_arm/blob/master/images/maxIter10000.png)  
+> image after 'rosrun moveit_planner rrtPlanner visual 1 maxIter 10000'  
 
 ### 3 Learnt RRT
 **TODO**
