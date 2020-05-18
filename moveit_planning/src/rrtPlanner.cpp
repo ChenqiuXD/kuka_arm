@@ -1,5 +1,4 @@
 #include "rrtPlanner.h"
-#include <moveit_msgs/RobotState.h>
 #include <iostream>
 #include <math.h>
 #include <random>
@@ -7,8 +6,8 @@
 using namespace std;
 
 rrtPlanner::rrtPlanner(ros::NodeHandle& nh,
-            robot_model::RobotModelPtr kinematic_model,
-            planning_scene_monitor::PlanningSceneMonitorPtr planning_scene_monitor_) : nh(nh)
+                       robot_model::RobotModelPtr kinematic_model,
+                       planning_scene_monitor::PlanningSceneMonitorPtr planning_scene_monitor_) : nh(nh)
 {
     this->kinematicModel = kinematic_model;
     robot_state::RobotStatePtr kinematic_state(new robot_state::RobotState(kinematic_model));
@@ -18,28 +17,10 @@ rrtPlanner::rrtPlanner(ros::NodeHandle& nh,
     this->planningSceneMonitor_ = planning_scene_monitor_;
 
     // Rviz display publisher
+    // visual_tools_.reset(new rviz_visual_tools::RvizVisualTools("/world","/visualization_marker"));
     markerPub = nh.advertise<visualization_msgs::Marker>("visualization_marker", 10);
-
-    // Get the joint limits from ros server
-    int upper, lower;
-    stringstream ss;
-    for(size_t i=0; i<JOINTNUM; i++){
-        ss << "/joint_limits/joint_a" << i+1 << "/upper";
-        bool isLimitsFound = nh.getParam(ss.str(),upper); 
-        if(!isLimitsFound){
-            ROS_ERROR("No limits information found, check whether rrtPlanner.launch is launched");
-            break;
-        }
-        ss.str("");
-        jointUpperLimits[i] = upper;
-        cout << "The upper is: " << jointUpperLimits[i] << endl;
-
-        ss << "/joint_limits/joint_a" << i+1 << "/lower";
-        nh.getParam(ss.str(),lower);
-        ss.str("");
-        jointLowerLimits[i] = lower;
-        cout << "The lower is: " << jointLowerLimits[i] << endl;
-    }           
+    // Readin joint limits
+    readJntLimits();           
 }
 
 node rrtPlanner::sampleNode()
@@ -50,21 +31,29 @@ node rrtPlanner::sampleNode()
     randNode.prevNodeid = -1;
     srand(time(NULL));
     random_device rd;
-    for(int i=0; i<JOINTNUM; i++){
-        jointAng = rd() % (jointUpperLimits[i]-jointLowerLimits[i]) + jointLowerLimits[i];
-        randNode.jointAngles.push_back(jointAng);
+
+    // 5 percent probability that the randNode is the goalNode
+    if(this->goalExtend && rd()%100 < 5){
+            int goalId = rd() % goalNodes.size();
+            randNode = goalNodes[goalId]; 
+    }else{
+        for(int i=0; i<JOINTNUM; i++){
+            jointAng = rd() % (jointUpperLimits[i]-jointLowerLimits[i]) + jointLowerLimits[i];
+            randNode.jointAngles.push_back(jointAng);
+        }
     }
+    
     return randNode;
 }
 
-int rrtPlanner::findNearest(node randNode)
+int rrtPlanner::findNearest(node randNode, vector<node> tree)
 {
     // Use brute-force method to find the nearest node among the tree
     // return the id of that nearest node
-    double dist, minDist=float('inf');
+    double dist, minDist = DBL_MAX;
     int minid = -1;
-    for(int i=0;i<rrtTree.size();i++){
-        dist = calcDist(rrtTree[i], randNode); 
+    for(int i=0;i<tree.size();i++){
+        dist = calcDist(tree[i], randNode); 
         if(dist<minDist){
             minDist = dist;
             minid = i;
@@ -86,17 +75,18 @@ double rrtPlanner::calcDist(node a, node b)
     return result;
 }
 
-void rrtPlanner::extend(int id, node randNode)
+node rrtPlanner::extend(int id, node randNode)
 {
+    node newNode; 
     // Check the feasibility and extend the node
     if(id==-1){
         ROS_ERROR("Nearest node's id is -1, check the size of rrtTree: %d", (int)rrtTree.size());
-        return;
+        newNode.id = -1;
+        return newNode;
     }
+
     node nearestNode = rrtTree[id];
     double distance = calcDist(nearestNode, randNode);
-    node newNode;
-
     double step = STEP*JOINTNUM;
     if(distance<=step){
         newNode = randNode;
@@ -111,20 +101,13 @@ void rrtPlanner::extend(int id, node randNode)
 
     bool isFeasible = checkFeasbility(nearestNode, newNode);
     if(isFeasible){
-        bool isReachGoal = checkReachGoal(newNode);
         newNode.prevNodeid = nearestNode.id;
         newNode.id = rrtTree.size();
-        rrtTree.push_back(newNode);
-        if(isReachGoal){
-            this->success = true;
-        }
-
-        if(this->enableVisual != VISUAL_TYPES::NO_VISUAL){
-            drawNewNode(newNode);
-        }
+        return newNode;
+    }else{
+        newNode.id = -1;
+        return newNode;
     }
-
-    cout << "Current node counts is: " << rrtTree.size() << endl;
 }
 
 bool rrtPlanner::checkReachGoal(node newNode)
@@ -136,7 +119,7 @@ bool rrtPlanner::checkReachGoal(node newNode)
         distance = calcDist(newNode, goalNodes[i]);
         if(distance < minGoalDist){minGoalDist = distance;}
         if(distance > maxGoalDist){maxGoalDist = distance;}
-        if(distance<=GOALTOLERANCE*JOINTNUM){
+        if(distance<=goalTolerance*JOINTNUM){
             result = true;
             break;
         }
@@ -182,11 +165,11 @@ void rrtPlanner::findPath()
 {
     cout << "Starting from the last node: " << rrtTree.size()-1 << endl;
     node curNode = rrtTree.back();
-    while(curNode.id!=0){
+    do{
         this->path.push_back(curNode);
         cout << "Connecting " << curNode.id << "th node with " << curNode.prevNodeid << "th node. " << endl;
         curNode = rrtTree[curNode.prevNodeid];
-    }
+    }while(curNode.id!=0);
     path.push_back(initialNode);
 }
 
@@ -197,12 +180,24 @@ bool rrtPlanner::plan()
 
     // The main plan process, return true if successfully planned.
     int count = 0;
-    while(this->success==false && count < MAXITER){
+    while(this->success==false && count < maxIter){
         node randNode = sampleNode();
-        int nearestNodeid = findNearest(randNode);
-        extend(nearestNodeid, randNode);
+        int nearestNodeid = findNearest(randNode, this->rrtTree);
+        node newNode = extend(nearestNodeid, randNode);
+        if(newNode.id!=-1){ // Means that the newNode is feasible, look at checkFeasibility()
+            if( checkReachGoal(newNode) ){
+                this->success = true;
+            }
+            rrtTree.push_back(newNode);
+
+            if(this->enableVisual != VISUAL_TYPES::NO_VISUAL){
+                drawNewNode(newNode);
+            }
+        }
+        cout << "Current node count: " << rrtTree.size() << endl;
         count += 1;
     }
+    
     if(this->success){
         findPath();
         drawPlan();

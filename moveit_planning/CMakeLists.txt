@@ -225,38 +225,61 @@ target_link_libraries(obstacle_adder
 )
 
 add_library(rrtPlanner
-  src/rrt_utils.cpp
   src/rrtPlanner.cpp
+  src/rrt_utils
 )
 add_dependencies(rrtPlanner ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
 target_link_libraries(rrtPlanner
   ${catkin_LIBRARIES}
 )
 
-add_executable(moveit_planner
-  src/moveit_planner.cpp
+add_library(bi_rrtPlanner
+  src/bi_rrtPlanner.cpp
+  src/rrt_utils.cpp
 )
-add_dependencies(moveit_planner ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
-target_link_libraries(moveit_planner
-  obstacle_adder
-  ${catkin_LIBRARIES}
-)
-
-add_executable(moveit_planner_rrt
-  src/moveit_planner_rrt.cpp
-)
-add_dependencies(moveit_planner_rrt ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
-target_link_libraries(moveit_planner_rrt
-  obstacle_adder
+add_dependencies(bi_rrtPlanner ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
+target_link_libraries(bi_rrtPlanner
   rrtPlanner
   ${catkin_LIBRARIES}
 )
 
-add_executable(try
-  src/try.cpp
+add_library(target_pose_utils
+  include/moveit_planning/target_pose_utils.h
+  src/target_pose_utils.cpp
 )
-add_dependencies(try ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
-target_link_libraries(try
+add_dependencies(target_pose_utils ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
+target_link_libraries(target_pose_utils
   ${catkin_LIBRARIES}
 )
 
+add_executable(plan_moveit
+  src/plan_moveit.cpp
+)
+add_dependencies(plan_moveit ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
+target_link_libraries(plan_moveit
+  target_pose_utils
+  obstacle_adder
+  ${catkin_LIBRARIES}
+)
+
+add_executable(plan_rrt
+  src/plan_rrt.cpp
+)
+add_dependencies(plan_rrt ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
+target_link_libraries(plan_rrt
+  target_pose_utils
+  obstacle_adder
+  rrtPlanner
+  bi_rrtPlanner
+  ${catkin_LIBRARIES}
+)
+
+# add_executable(bi_rrt
+#   src/moveit_planner_birrt.cpp
+# )
+# add_dependencies(bi_rrt ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
+# target_link_libraries(bi_rrt
+#   obstacle_adder
+#   bi_rrtPlanner
+#   ${catkin_LIBRARIES}
+# )

@@ -1,8 +1,33 @@
 #include "rrtPlanner.h"
+#include <iostream>
+
+void rrtPlanner::readJntLimits()
+{
+    int upper, lower;
+    stringstream ss;
+    for(size_t i=0; i<JOINTNUM; i++){
+        ss << "/joint_limits/joint_a" << i+1 << "/upper";
+        bool isLimitsFound = nh.getParam(ss.str(),upper); 
+        if(!isLimitsFound){
+            ROS_ERROR("No limits information found, check whether rrtPlanner.launch is launched");
+            break;
+        }
+        ss.str("");
+        jointUpperLimits[i] = upper;
+        cout << "The upper is: " << jointUpperLimits[i] << endl;
+
+        ss << "/joint_limits/joint_a" << i+1 << "/lower";
+        nh.getParam(ss.str(),lower);
+        ss.str("");
+        jointLowerLimits[i] = lower;
+        cout << "The lower is: " << jointLowerLimits[i] << endl;
+    }
+}
 
 void rrtPlanner::setGoalNode(vector<int> jointPosition)
 {
     node ikGoalNode;
+    ikGoalNode.id = 0;
     ikGoalNode.jointAngles = jointPosition;
     goalNodes.push_back(ikGoalNode);
 }
@@ -70,10 +95,12 @@ void rrtPlanner::initialize()
     }
     rrtTree.push_back(initialNode);
     path.clear();
-    minGoalDist = float('inf');
+    minGoalDist = DBL_MAX;
     maxGoalDist = 0;
     success = false;
 
+    // Tried, but useless
+    // this->visual_tools_->deleteAllMarkers(); 
     initrrtVisual();
     initPathVisual();
 }
@@ -134,11 +161,6 @@ void rrtPlanner::initPathVisual()
     // Line strip is blue
     pathEdges.color.r = 1.0;
     pathEdges.color.a = 1.0; 
-}
-
-void rrtPlanner::setVisualParam(int visualType)
-{
-    this->enableVisual = visualType;
 }
 
 void rrtPlanner::drawNewNode(node newNode)
@@ -205,20 +227,21 @@ void rrtPlanner::calcNodePose(node newNode, geometry_msgs::Point *nodePose)
 
 void rrtPlanner::generatePlanMsg(double time, moveit::planning_interface::MoveGroupInterface::Plan* my_plan)
 {
-    my_plan->planning_time_ = time;    
-    moveit_msgs::RobotState robot_state;
-    sensor_msgs::JointState joint_state;
+    // my_plan->planning_time_ = time;    
+    // moveit_msgs::RobotState robot_state;
+    // sensor_msgs::JointState joint_state;
 
-    std_msgs::Header header;
-    header.stamp = ros::Time::now();
-    header.frame_id = "/world";
-    joint_state.header = header;
+    // std_msgs::Header header;
+    // header.stamp = ros::Time::now();
+    // header.frame_id = "/world";
+    // joint_state.header = header;
 
-    vector<string> s;
-    nh.getParam("/joint_names", s);
-    joint_state.name = s;
+    // vector<string> s;
+    // nh.getParam("/joint_names", s);
+    // joint_state.name = s;
 
     // TODO
+    ;
 }
 
 void rrtPlanner::degreeToRadian(vector<int> degree, vector<double> *radian)
@@ -278,15 +301,27 @@ void rrtPlanner::setParam(string paramName, string paramValue)
         }
     }else if( paramName == "maxIter" ){
         if(value>0){
-            this->MAXITER = value;
+            this->maxIter = value;
         }else{
             ROS_ERROR("The input maxIter is minus");
         }
     }else if( paramName == "tolerance" ){
         if(value>0){
-            this->GOALTOLERANCE = value;
+            this->goalTolerance = value;
         }else{
             ROS_ERROR("The tolerance must bigger than 0");
         }
+    }else if( paramName == "goalExtend" ){
+        if(value==0 || value==1){
+            this->goalExtend = value;    
+        }else{
+            ROS_ERROR("The goalExtend only accept 1 or 0");
+        }
+        
     }
+}
+
+void rrtPlanner::setVisualParam(int visualType)
+{
+    this->enableVisual = visualType;
 }

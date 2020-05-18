@@ -98,20 +98,20 @@ void Obstacle_Adder::add_obstacles()
             collision_object.primitive_poses.push_back(p);
 
             collision_object.operation = collision_object.ADD;
-        }else if(element_name=="box::link"){            
-            ROS_INFO("Detected unit_box");
-            collision_object.id = "box::link";
+        // }else if(element_name=="box::link"){            
+        //     ROS_INFO("Detected unit_box");
+        //     collision_object.id = "box::link";
             
-            shape_msgs::SolidPrimitive primitive;
-            primitive.type = primitive.BOX;
-            primitive.dimensions.resize(3);
-            primitive.dimensions[0] = 0.08;
-            primitive.dimensions[1] = 0.08;
-            primitive.dimensions[2] = 0.08;
+        //     shape_msgs::SolidPrimitive primitive;
+        //     primitive.type = primitive.BOX;
+        //     primitive.dimensions.resize(3);
+        //     primitive.dimensions[0] = 0.08;
+        //     primitive.dimensions[1] = 0.08;
+        //     primitive.dimensions[2] = 0.08;
 
-            collision_object.primitives.push_back(primitive);
-            collision_object.primitive_poses.push_back(this->obs_poses[element_name]);
-            collision_object.operation = collision_object.ADD;
+        //     collision_object.primitives.push_back(primitive);
+        //     collision_object.primitive_poses.push_back(this->obs_poses[element_name]);
+        //     collision_object.operation = collision_object.ADD;
         }else{
             continue;
         }
