@@ -2,6 +2,9 @@
 ## Overview
 This project is written for the graduation program in ZJU. It's a simulation setting for kuka_kr6r900sixx manipulator on gazebo and displayed by rviz. User can use function in Moveit! or write his own motion planning function and test them by this simulation setting.
 
+Plus a Qt-based simulation environment in the folder rrt-simulator-master forked from this repo:  
+> https://github.com/sourishg/rrt-simulator  
+
 ## Packages and brief introduction
 src  
 ├── kuka_kr6_control  
@@ -89,7 +92,13 @@ For maxIter 10000, the search result is as follows
 ## Working Pipeline Explanation
 **TODO**
 
-
+## Qt-based simulation
+To run the simulation, open the terminal in the rrt-simulator-master and run  
+> ./build.sh  
+Note that you need Qt tools to build the target  
+Then run:  
+> ./bin/rrt-test  
+Then please run as the original repository says.
 
 ## TODO
 1 RRT is not finished therefore the outcome is incorrect  
