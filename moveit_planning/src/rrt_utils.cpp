@@ -305,12 +305,12 @@ void rrtPlanner::setParam(string paramName, string paramValue)
         }else{
             ROS_ERROR("The input maxIter is minus");
         }
-    }else if( paramName == "tolerance" ){
-        if(value>0){
-            this->goalTolerance = value;
-        }else{
-            ROS_ERROR("The tolerance must bigger than 0");
-        }
+    // }else if( paramName == "tolerance" ){
+    //     if(value>0){
+    //         this->goalTolerance = value;
+    //     }else{
+    //         ROS_ERROR("The tolerance must bigger than 0");
+    //     }
     }else if( paramName == "goalExtend" ){
         if(value==0 || value==1){
             this->goalExtend = value;    

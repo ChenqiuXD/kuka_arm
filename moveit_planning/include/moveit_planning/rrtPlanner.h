@@ -74,6 +74,7 @@ public:
 
     // Angle tolerance per joint
     double goalTolerance = 3;
+    vector<double> goalToleranceVec{3,3,3,360,360,360};
     // STEP : Used in extend, determine the extending step
     double STEP = 0.5;
     // FEASI_PIESCES_NUM : Used in checkFeasibility, determine the number of pieces
@@ -84,7 +85,7 @@ public:
     // Name of the end-effctor
     string END_EFFECTOR_NAME = "tool0";
     // With probability the tree would extend towards the goal
-    bool goalExtend = false;
+    bool goalExtend = true;
 
     robot_model::RobotModelPtr kinematicModel;
     robot_state::RobotStatePtr kinematicState;
@@ -97,6 +98,7 @@ public:
     visualization_msgs::Marker line_list;
     visualization_msgs::Marker pathVertices;
     visualization_msgs::Marker pathEdges;
+    geometry_msgs::Pose goalPose;
 
     double minGoalDist = DBL_MAX;
     double maxGoalDist = 0;

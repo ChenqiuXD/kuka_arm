@@ -1,0 +1,11 @@
+{
+    "files.associations": {
+        "deque": "cpp",
+        "string": "cpp",
+        "vector": "cpp",
+        "ostream": "cpp",
+        "qmainwindow": "cpp",
+        "qwidget": "cpp",
+        "qline": "cpp"
+    }
+}

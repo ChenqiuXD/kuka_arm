@@ -46,7 +46,6 @@ int main(int argc, char** argv)
     const robot_state::JointModelGroup* joint_model_group =
         move_group.getCurrentState()->getJointModelGroup(PLANNING_GROUP);
 
-    // robot_model_loader::RobotModelLoader robot_model_loader("robot_description");
     robot_model_loader::RobotModelLoaderPtr robot_model_loader_;
     robot_model_loader_.reset(new robot_model_loader::RobotModelLoader("robot_description"));
     robot_model::RobotModelPtr kinematic_model = robot_model_loader_->getModel();
@@ -69,10 +68,11 @@ int main(int argc, char** argv)
     visual_tools.trigger();
 
     // MAIN LOOP
-    ROS_INFO("Currently running moveit planning");
+    ROS_INFO("Currently running RRT planning");
     while(ros::ok()){
         // Refresh the obstacles for next plan
         obs_adder.add_obstacles();
+        visual_tools.deleteAllMarkers();
 
         visual_tools.prompt("Press 'next' to plan a path");
 
@@ -81,7 +81,7 @@ int main(int argc, char** argv)
         tf::Quaternion q = transform.getRotation();
 
         // Check whether receive any transform
-        if(pow(q[0],2) + pow(q[1],2) + pow(q[2],2) + pow(q[3],2) == 1){   
+        if( abs(pow(q[0],2) + pow(q[1],2) + pow(q[2],2) + pow(q[3],2) - 1)<=0.01) {   
             ROS_INFO("Entering the planning mode");     
             geometry_msgs::Pose target_pose = setTarget(transform);
 

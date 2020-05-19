@@ -17,11 +17,47 @@ rrtPlanner::rrtPlanner(ros::NodeHandle& nh,
     this->planningSceneMonitor_ = planning_scene_monitor_;
 
     // Rviz display publisher
-    // visual_tools_.reset(new rviz_visual_tools::RvizVisualTools("/world","/visualization_marker"));
     markerPub = nh.advertise<visualization_msgs::Marker>("visualization_marker", 10);
     // Readin joint limits
     readJntLimits();           
 }
+
+bool rrtPlanner::plan()
+{
+    // Set some parameters i.e. this->success...
+    initialize();
+
+    // The main plan process, return true if successfully planned.
+    int count = 0;
+    while(!this->success && count < this->maxIter){
+        node randNode = sampleNode();
+        int nearestNodeid = findNearest(randNode, this->rrtTree);
+        node newNode = extend(nearestNodeid, randNode);
+        if(newNode.id!=-1){ // -1 means that the newNode is not feasible
+            if( checkReachGoal(newNode) ){
+                this->success = true;
+            }
+            rrtTree.push_back(newNode);
+
+            if(this->enableVisual != VISUAL_TYPES::NO_VISUAL){
+                drawNewNode(newNode);
+            }
+        }
+        cout << "Current node count: " << rrtTree.size() << endl;
+        count += 1;
+    }
+    
+    if(this->success){
+        findPath();
+        drawPlan();
+    }else{
+        ROS_WARN("No available path found");
+    }
+    cout << "Minimum distance is: " << minGoalDist << endl;
+    cout << "Maximum distance is: " << maxGoalDist << endl;
+    return this->success;
+}
+
 
 node rrtPlanner::sampleNode()
 {
@@ -32,10 +68,12 @@ node rrtPlanner::sampleNode()
     srand(time(NULL));
     random_device rd;
 
-    // 5 percent probability that the randNode is the goalNode
-    if(this->goalExtend && rd()%100 < 5){
-            int goalId = rd() % goalNodes.size();
-            randNode = goalNodes[goalId]; 
+    // if goalExtend, then 5 percent probability that the randNode is set to the goalNode
+    if(this->goalExtend && rd()%100 < 3){
+        // Sample a goal node in goalNodes. Currently only one node, therefore abandoned
+        // int goalId = rd() % this->goalNodes.size();
+        // randNode = goalNodes[goalId]; 
+        randNode = this->goalNodes[0];
     }else{
         for(int i=0; i<JOINTNUM; i++){
             jointAng = rd() % (jointUpperLimits[i]-jointLowerLimits[i]) + jointLowerLimits[i];
@@ -78,13 +116,6 @@ double rrtPlanner::calcDist(node a, node b)
 node rrtPlanner::extend(int id, node randNode)
 {
     node newNode; 
-    // Check the feasibility and extend the node
-    if(id==-1){
-        ROS_ERROR("Nearest node's id is -1, check the size of rrtTree: %d", (int)rrtTree.size());
-        newNode.id = -1;
-        return newNode;
-    }
-
     node nearestNode = rrtTree[id];
     double distance = calcDist(nearestNode, randNode);
     double step = STEP*JOINTNUM;
@@ -99,6 +130,7 @@ node rrtPlanner::extend(int id, node randNode)
         }
     }
 
+    // Check collision of points between nearestNode and newNode 
     bool isFeasible = checkFeasbility(nearestNode, newNode);
     if(isFeasible){
         newNode.prevNodeid = nearestNode.id;
@@ -114,13 +146,18 @@ bool rrtPlanner::checkReachGoal(node newNode)
 {
     // Use kinematics to calculate the distance between newNode's end-effector's pose and the goalPose
     double distance;
-    bool result = false;
-    for(int i=0;i<goalNodes.size();i++){
-        distance = calcDist(newNode, goalNodes[i]);
-        if(distance < minGoalDist){minGoalDist = distance;}
-        if(distance > maxGoalDist){maxGoalDist = distance;}
-        if(distance<=goalTolerance*JOINTNUM){
-            result = true;
+    bool result = true;
+
+    distance = calcDist(newNode, goalNodes[0]);
+    if(distance < minGoalDist){minGoalDist = distance;}
+    if(distance > maxGoalDist){maxGoalDist = distance;}
+    // if(distance > goalTolerance*JOINTNUM){
+    //     result = false;
+    //     break;
+    // }
+    for( size_t j=0;j<JOINTNUM;++j ){
+        if( abs(newNode.jointAngles[j] -goalNodes[0].jointAngles[j]) >this->goalToleranceVec[j] ){
+            result = false;
             break;
         }
     }
@@ -171,41 +208,5 @@ void rrtPlanner::findPath()
         curNode = rrtTree[curNode.prevNodeid];
     }while(curNode.id!=0);
     path.push_back(initialNode);
-}
-
-bool rrtPlanner::plan()
-{
-    // Set some parameters i.e. this->success...
-    initialize();
-
-    // The main plan process, return true if successfully planned.
-    int count = 0;
-    while(this->success==false && count < maxIter){
-        node randNode = sampleNode();
-        int nearestNodeid = findNearest(randNode, this->rrtTree);
-        node newNode = extend(nearestNodeid, randNode);
-        if(newNode.id!=-1){ // Means that the newNode is feasible, look at checkFeasibility()
-            if( checkReachGoal(newNode) ){
-                this->success = true;
-            }
-            rrtTree.push_back(newNode);
-
-            if(this->enableVisual != VISUAL_TYPES::NO_VISUAL){
-                drawNewNode(newNode);
-            }
-        }
-        cout << "Current node count: " << rrtTree.size() << endl;
-        count += 1;
-    }
-    
-    if(this->success){
-        findPath();
-        drawPlan();
-    }else{
-        ROS_WARN("No available path found");
-    }
-    cout << "Minimum distance is: " << minGoalDist << endl;
-    cout << "Maximum distance is: " << maxGoalDist << endl;
-    return this->success;
 }
 
