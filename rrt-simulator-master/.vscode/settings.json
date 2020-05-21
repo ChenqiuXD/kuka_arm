@@ -6,6 +6,7 @@
         "ostream": "cpp",
         "qmainwindow": "cpp",
         "qwidget": "cpp",
-        "qline": "cpp"
+        "qline": "cpp",
+        "iostream": "cpp"
     }
 }

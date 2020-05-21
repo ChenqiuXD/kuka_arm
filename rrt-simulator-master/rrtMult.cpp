@@ -1,0 +1,282 @@
+#include "rrtMult.h"
+
+
+RRTMult::RRTMult()
+{
+    obstacles = new Obstacles;
+    startPos.x() = START_POS_X;
+    startPos.y() = START_POS_Y;
+    endPos.x() = END_POS_X;
+    endPos.y() = END_POS_Y;
+    goalPos.x() = END_POS_X;
+    goalPos.y() = END_POS_Y;
+    // root = new Node;
+    // root->parent = NULL;
+    // root->position = startPos;
+    // lastNode = root;
+    // tempNodes.push_back(root);
+    // nodes.push_back(root);
+    step_size = 3;
+    max_iter = 3000;
+}
+
+/**
+ * @brief plan loop of RRT
+ */
+bool RRTMult::plan()
+{
+    initialize();
+    getSimplePath();
+    seperateSimplePath();
+
+    bool result = false;
+    int iterCount = 0;
+    while(!this->success && iterCount<=this->max_iter){
+        Node *q = getRandomNode();
+        if(q){
+            Node *qNearest = nearest(q->position);
+            Vector2f newPos = newConfig(q, qNearest);
+            if(!isSegInObstacle(q, qNearest)){
+                Node *qNew = new Node;
+                qNew->position = newPos;
+                add(qNearest, qNew);
+
+                int groupid, nodeid;
+                checkConnection(&groupid, &nodeid);
+                if(groupid){
+                    connectToGroup(groupid, nodeid);
+                }
+            }
+        }
+
+        ++iterCount;
+    }
+    findPath();
+}
+
+/**
+ * @brief Initialize root node of RRT.
+ */
+void RRTMult::initialize()
+{
+    this->simplePath.clear();
+    this->tempNodes.clear();
+    this->nodeGroups.clear();
+}
+
+/**
+ * @brief Generate a simple plan by directly linking start and end
+ */
+void RRTMult::getSimplePath()
+{
+    Node *curNode = new Node;
+    curNode->parent = NULL;
+    curNode->position = startPos;
+    Vector2f intermediate = endPos - startPos;
+    Vector2f step = this->step_size * intermediate / intermediate.norm();
+    
+    while(curNode->position(0) < goalPos(0)){
+        Node *nextNode = new Node;
+        nextNode->parent = curNode;
+        curNode->children.push_back(nextNode);
+        nextNode->position = curNode->position + step;
+        this->simplePath.push_back(curNode);
+//         cout << "New point is: " << curNode->position(0) << " " << curNode->position(1) << endl;
+        curNode = nextNode;
+    }
+}
+
+/**
+ * @brief Get the groups of nodes
+ *      Seperate the simple path nodes with obstacles and group them
+ *      into this->nodeGroups
+ */
+void RRTMult::seperateSimplePath()
+{
+    this->groupCount = 0;
+    vector<Node *> group;
+    for(size_t i=0; i<this->simplePath.size()-1; ++i){
+        this->nodes.push_back(simplePath[i]);
+        group.push_back(simplePath[i]);
+        if( this->isSegInObstacle(simplePath[i], simplePath[i+1]) ){
+            do{
+                cout << "Obstacle in between: " << i << " " << i+1 << endl;
+                ++i;
+            }while( !this->isSegInObstacle(simplePath[i], simplePath[i+1]) );
+            this->groupCount += 1;
+            this->nodeGroups.push_back(group);
+            group.clear();
+        }else{
+            cout << "No obstacle in between " << i << " " << i+1 << endl;
+        }
+    }
+}
+
+/**
+ * @brief Generate a random node in the field.
+ * @return
+ */
+Node* RRTMult::getRandomNode()
+{
+    Node* ret;
+    Vector2f point(drand48() * WORLD_WIDTH, drand48() * WORLD_HEIGHT);
+    if (point.x() >= 0 && point.x() <= WORLD_WIDTH && point.y() >= 0 && point.y() <= WORLD_HEIGHT) {
+        ret = new Node;
+        ret->position = point;
+        return ret;
+    }
+    return NULL;
+}
+
+/**
+ * @brief Get nearest node from a given configuration/position.
+ * @param point
+ * @return
+ */
+Node* RRTMult::nearest(Vector2f point)
+{
+    float minDist = 1e9;
+    Node *closest = NULL;
+    for(int i = 0; i < (int)tempNodes.size(); i++) {
+        float dist = distance(point, tempNodes[i]->position);
+        if (dist < minDist) {
+            minDist = dist;
+            closest = tempNodes[i];
+        }
+    }
+    return closest;
+}
+
+/**
+ * @brief Find a configuration at a distance step_size from nearest node to random node.
+ * @param q
+ * @param qNearest
+ * @return
+ */
+Vector2f RRTMult::newConfig(Node *q, Node *qNearest)
+{
+    int dist = this->distance(q->position, qNearest->position);
+    Vector2f ret;
+    if(dist>this->step_size){
+        Vector2f to = q->position;
+        Vector2f from = qNearest->position;
+        Vector2f intermediate = to - from;
+        intermediate = intermediate / intermediate.norm();
+        ret = from + step_size * intermediate;
+    }else{
+        ret = q->position;
+    }
+    return ret;
+}
+
+/**
+ * @brief Add a node to the tree.
+ * @param qNearest
+ * @param qNew
+ */
+void RRTMult::add(Node *qNearest, Node *qNew)
+{
+    qNew->parent = qNearest;
+    qNearest->children.push_back(qNew);
+    tempNodes.push_back(qNew);
+    lastNode = qNew;
+}
+
+/**
+ * @brief Add a node to the tree.
+ * @param groupid   : store the connected group num
+ * @param nodeid    : store the connected node num
+ */
+void RRTMult::checkConnection(int *groupid, int *nodeid)
+{
+    int dist, minDist = 1e9;
+    size_t connectGroupid = 0, minNodeid = 0;
+    for(size_t i=1; i<nodeGroups.size(); ++i){
+        for(size_t j=0; j<nodeGroups[i].size(); ++j){
+            dist = distance(lastNode->position, nodeGroups[i][j]->position);
+            if(dist<minDist){
+                minDist = dist;
+                if(minDist<step_size){
+                    connectGroupid = i;
+                    minNodeid = j;
+                }
+            }
+        }
+    }
+    *groupid = connectGroupid;
+    *nodeid = minNodeid;
+}
+
+/**
+ * @brief Add a node to the tree.
+ * @param groupid   : store the connected group num
+ * @param nodeid    : store the connected node num
+ */
+void RRTMult::connectToGroup(int groupid, int nodeid)
+{
+    lastNode->children.push_back(nodeGroups[groupid][nodeid]);
+    nodeGroups[groupid][nodeid]->parent = lastNode;
+    if(groupid==groupCount){
+        this->success = true;
+    }else{
+        tempNodes.insert(tempNodes.end(),
+                         nodeGroups[groupid].begin(),
+                         nodeGroups[groupid].end());
+    }    
+}
+
+/**
+ * @brief Find path if successful, otherwise find the nearest point
+ * @return
+ */
+void RRTMult::findPath()
+{
+    Node *q;
+    if(this->success){
+        q = *(simplePath.end()-1);
+    }else{
+        q = nearest(this->endPos);
+    }
+
+    while(q!=NULL){
+        path.push_back(q);
+        q = q->parent;
+    }
+}
+
+// Utils functions
+/**
+ * @brief Helper method to find distance between two positions.
+ * @param p
+ * @param q
+ * @return
+ */
+int RRTMult::distance(Vector2f &p, Vector2f &q)
+{
+    Vector2f v = p - q;
+    return sqrt(powf(v.x(), 2) + powf(v.y(), 2));
+}
+
+void RRTMult::setStepSize(int step)
+{
+    step_size = step;
+}
+
+void RRTMult::setMaxIterations(int iter)
+{
+    max_iter = iter;
+}
+
+/**
+ * @brief Check whether two nodes intersect the border of any obstacles
+ *      Note that this function only check for intersection. If two nodes
+ *      are both in the obstacles, the function would not detect collision
+ * @param a
+ * @param b
+ * @return Collided or not
+ */
+bool RRTMult::isSegInObstacle(Node *a, Node *b)
+{
+    return this->obstacles->isSegmentInObstacle(a->position, b->position);
+}
+
