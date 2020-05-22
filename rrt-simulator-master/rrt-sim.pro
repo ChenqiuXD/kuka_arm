@@ -13,9 +13,9 @@ TEMPLATE = app
 
 CONFIG += c++11
 
-SOURCES += main.cpp mainwindow.cpp obstacles.cpp renderarea.cpp rrt.cpp
+SOURCES += main.cpp mainwindow.cpp obstacles.cpp renderarea.cpp rrt.cpp rrtMult.cpp
 
 HEADERS  += constants.h mainwindow.h obstacles.h\
-            renderarea.h rrt.h ui_mainwindow.h
+            renderarea.h rrt.h ui_mainwindow.h rrtMult.h
 
 FORMS    += mainwindow.ui

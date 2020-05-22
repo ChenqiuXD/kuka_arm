@@ -7,6 +7,8 @@ RenderArea::RenderArea(QWidget *parent) : QWidget(parent)
     setAttribute(Qt::WA_StaticContents);
     scribbling = false;
     rrt = new RRT;
+    rrtMult = new RRTMult;
+    planType = 1;    // 0->original RRT, 1->multRRT
 }
 
 /**
@@ -65,13 +67,24 @@ void RenderArea::drawObstacles(QPainter &painter)
     painter.setPen(Qt::black);
     painter.setBrush(QBrush(Qt::black));
     pair<Vector2f, Vector2f> obstacle;
-    for(int i = 0; i < (int)rrt->obstacles->obstacles.size(); i++) {
-        obstacle = rrt->obstacles->obstacles[i];
-        QPoint topLeft(obstacle.first.x() + BOT_CLEARANCE, obstacle.first.y() + BOT_CLEARANCE);
-        QPoint bottomRight(obstacle.second.x() - BOT_CLEARANCE, obstacle.second.y() - BOT_CLEARANCE);
-        QRect rect(topLeft, bottomRight);
-        painter.drawRect(rect);
+    if(planType==0){
+        for(int i = 0; i < (int)rrt->obstacles->obstacles.size(); i++) {
+            obstacle = rrt->obstacles->obstacles[i];
+            QPoint topLeft(obstacle.first.x() + BOT_CLEARANCE, obstacle.first.y() + BOT_CLEARANCE);
+            QPoint bottomRight(obstacle.second.x() - BOT_CLEARANCE, obstacle.second.y() - BOT_CLEARANCE);
+            QRect rect(topLeft, bottomRight);
+            painter.drawRect(rect);
+        }
+    }else if(planType==1){
+        for(int i = 0; i < (int)rrtMult->obstacles->obstacles.size(); i++) {
+            obstacle = rrtMult->obstacles->obstacles[i];
+            QPoint topLeft(obstacle.first.x() + BOT_CLEARANCE, obstacle.first.y() + BOT_CLEARANCE);
+            QPoint bottomRight(obstacle.second.x() - BOT_CLEARANCE, obstacle.second.y() - BOT_CLEARANCE);
+            QRect rect(topLeft, bottomRight);
+            painter.drawRect(rect);
+        }
     }
+
     painter.restore();
 }
 
@@ -86,23 +99,44 @@ void RenderArea::drawNodes(QPainter &painter)
     painter.setPen(Qt::black);
     painter.setBrush(QBrush(Qt::black));
     Vector2f pos;
-    for(int i = 0; i < (int)rrt->nodes.size(); i++) {
-        for(int j = 0; j < (int)rrt->nodes[i]->children.size(); j++) {
-            pos = rrt->nodes[i]->children[j]->position;
-            painter.drawEllipse(pos.x()-1.5, pos.y()-1.5, 3, 3);
+    if(planType==0){
+        for(int i = 0; i < (int)rrt->nodes.size(); i++) {
+            for(int j = 0; j < (int)rrt->nodes[i]->children.size(); j++) {
+                pos = rrt->nodes[i]->children[j]->position;
+                painter.drawEllipse(pos.x()-1.5, pos.y()-1.5, 3, 3);
+            }
+            pos = rrt->nodes[i]->position;
+            painter.drawEllipse(pos.x() - NODE_RADIUS, pos.y() - NODE_RADIUS, 2 * NODE_RADIUS, 2 * NODE_RADIUS);
         }
-        pos = rrt->nodes[i]->position;
-        painter.drawEllipse(pos.x() - NODE_RADIUS, pos.y() - NODE_RADIUS, 2 * NODE_RADIUS, 2 * NODE_RADIUS);
+    }else if(planType==1){
+        for(int i = 0; i < (int)rrtMult->nodes.size(); i++) {
+            for(int j = 0; j < (int)rrtMult->nodes[i]->children.size(); j++) {
+                pos = rrtMult->nodes[i]->children[j]->position;
+                painter.drawEllipse(pos.x()-1.5, pos.y()-1.5, 3, 3);
+            }
+            pos = rrtMult->nodes[i]->position;
+            painter.drawEllipse(pos.x() - NODE_RADIUS, pos.y() - NODE_RADIUS, 2 * NODE_RADIUS, 2 * NODE_RADIUS);
+        }
     }
+
     painter.setPen(Qt::red);
     painter.setBrush(QBrush(Qt::red));
 
     // if a path exists, draw it.
-    for(int i = 0; i < (int)rrt->path.size() - 1; i++) {
-        QPointF p1(rrt->path[i]->position.x(), rrt->path[i]->position.y());
-        QPointF p2(rrt->path[i]->parent->position.x(), rrt->path[i]->parent->position.y());
-        painter.drawLine(p1, p2);
+    if(planType==0){
+        for(int i = 0; i < (int)rrt->path.size() - 1; i++) {
+            QPointF p1(rrt->path[i]->position.x(), rrt->path[i]->position.y());
+            QPointF p2(rrt->path[i]->parent->position.x(), rrt->path[i]->parent->position.y());
+            painter.drawLine(p1, p2);
+        }
+    }else if(planType==1){
+        for(int i = 0; i < (int)rrtMult->path.size() - 1; i++) {
+            QPointF p1(rrtMult->path[i]->position.x(), rrtMult->path[i]->position.y());
+            QPointF p2(rrtMult->path[i]->parent->position.x(), rrtMult->path[i]->parent->position.y());
+            painter.drawLine(p1, p2);
+        }  
     }
+
     painter.restore();
 }
 
@@ -134,7 +168,11 @@ void RenderArea::mouseReleaseEvent(QMouseEvent *event)
 {
     if (event->button() == Qt::LeftButton && scribbling) {
         QPoint curPoint = event->pos();
-        rrt->obstacles->addObstacle(Vector2f(lastMouseClickedPoint.x(), lastMouseClickedPoint.y()), Vector2f(curPoint.x(), curPoint.y()));
+        if(planType==0){
+            rrt->obstacles->addObstacle(Vector2f(lastMouseClickedPoint.x(), lastMouseClickedPoint.y()), Vector2f(curPoint.x(), curPoint.y()));
+        }else if(planType==1){
+            rrtMult->obstacles->addObstacle(Vector2f(lastMouseClickedPoint.x(), lastMouseClickedPoint.y()), Vector2f(curPoint.x(), curPoint.y()));
+        }        
         update();
         scribbling = false;
     }

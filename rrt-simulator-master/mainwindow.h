@@ -20,6 +20,7 @@ private:
     Ui::MainWindow *ui;
     RenderArea *renderArea;
     RRT *rrt;
+    RRTMult *rrtMult;
     bool simulated;
 private slots:
     void on_startButton_clicked();

@@ -2,6 +2,7 @@
 #define RENDERAREA_H
 
 #include "rrt.h"
+#include "rrtMult.h"
 #include <QWidget>
 #include <QColor>
 #include <QDebug>
@@ -17,7 +18,8 @@ class RenderArea : public QWidget
 public:
     RenderArea(QWidget *parent = 0);
     RRT *rrt;
-    RRT *rrt_2;
+    RRTMult *rrtMult;
+    int planType;   // 0 - rrt, 1 - rrtMult
 protected:
     void paintEvent(QPaintEvent *event);
     void mousePressEvent(QMouseEvent *event);

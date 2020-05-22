@@ -1,18 +1,7 @@
 #ifndef RRTMULT_H
 #define RRTMULT_H
 
-#include "obstacles.h"
-#include <iostream>
-#include <stdlib.h>
-#include <vector>
-#include <math.h>
-
-struct Node {
-    vector<Node *> children;
-    Node *parent;
-    Vector2f position;
-};
-
+#include "rrt.h"
 
 class RRTMult
 {
@@ -47,7 +36,7 @@ public:
     bool success;
 
     vector<Node *> simplePath;
-    vector<Node *> tempNodes;   // Store the nodes calculating while connecting two blocked nodes
+    vector<Node *> tempNodes;
     vector< vector<Node *> > nodeGroups;
 };
 

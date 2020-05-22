@@ -15,7 +15,7 @@ RRT::RRT()
     lastNode = root;
     tempNodes.push_back(root);
     nodes.push_back(root);
-    step_size = 3;
+    step_size = 10;
     max_iter = 3000;
 }
 
@@ -39,10 +39,10 @@ bool RRT::plan()
             }
         }
         if (this->reached()) {
-            // ui->statusBox->setText(tr("Reached Destination!"));
             result = true;
             break;
         }
+        // cout << "This is the " << i << "th iteration" << endl;
     }
 
     return result;
@@ -89,6 +89,7 @@ Node* RRT::getRandomNode()
     if (point.x() >= 0 && point.x() <= WORLD_WIDTH && point.y() >= 0 && point.y() <= WORLD_HEIGHT) {
         ret = new Node;
         ret->position = point;
+        // cout << "random points: " << ret->position[0] << " " << ret->position[1] << endl;
         return ret;
     }
     return NULL;
@@ -206,8 +207,13 @@ bool RRT::planConnect()
         this->setInitNode(this->blockedNodes[i]);
         this->setEndNode(this->blockedNodes[i+1]->position);
         success = this->plan();
-        if( !success ){break;}
+        if( !success ){
+            cout << "Failed to connect " << i << " and " << i+1 << " nodes, thus stop planning" << endl;
+            nodes.insert(nodes.end(), tempNodes.begin(), tempNodes.end());
+            break;
+        }
         else{
+            cout << "Successfully connect " << i << " and " << i+1 << " nodes. " << endl;
             this->lastNode->children.push_back(blockedNodes[i+1]);
             blockedNodes[i+1]->parent = this->lastNode;
             nodes.insert(nodes.end(), tempNodes.begin(), tempNodes.end());
@@ -242,7 +248,7 @@ void RRT::getSimplePlan()
         curNode->children.push_back(nextNode);
         nextNode->position = curNode->position + step;
         this->simplePath.push_back(curNode);
-//         cout << "New point is: " << curNode->position(0) << " " << curNode->position(1) << endl;
+        // cout << "New point is: " << curNode->position(0) << " " << curNode->position(1) << endl;
         curNode = nextNode;
     }
 }
@@ -261,8 +267,10 @@ void RRT::getBlockedNodes()
             do{
                 cout << "Obstacle in between: " << i << " " << i+1 << endl;
                 ++i;
-            }while( !this->isSegInObstacle(simplePath[i], simplePath[i+1]) );
-            this->blockedNodes.push_back(simplePath[i+1]);
+            }while( i<simplePath.size() && !this->isSegInObstacle(simplePath[i], simplePath[i+1]) );
+            if(i<=simplePath.size()-1){
+                this->blockedNodes.push_back(simplePath[i+1]);
+            }
         }else{
             cout << "No obstacle in between " << i << " " << i+1 << endl;
             ;

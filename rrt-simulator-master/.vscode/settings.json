@@ -7,6 +7,10 @@
         "qmainwindow": "cpp",
         "qwidget": "cpp",
         "qline": "cpp",
-        "iostream": "cpp"
+        "iostream": "cpp",
+        "*.tcc": "cpp",
+        "istream": "cpp",
+        "list": "cpp",
+        "unordered_map": "cpp"
     }
 }

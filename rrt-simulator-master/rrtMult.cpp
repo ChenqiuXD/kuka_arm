@@ -10,12 +10,6 @@ RRTMult::RRTMult()
     endPos.y() = END_POS_Y;
     goalPos.x() = END_POS_X;
     goalPos.y() = END_POS_Y;
-    // root = new Node;
-    // root->parent = NULL;
-    // root->position = startPos;
-    // lastNode = root;
-    // tempNodes.push_back(root);
-    // nodes.push_back(root);
     step_size = 3;
     max_iter = 3000;
 }
@@ -25,11 +19,17 @@ RRTMult::RRTMult()
  */
 bool RRTMult::plan()
 {
+    this->success = false;
     initialize();
     getSimplePath();
     seperateSimplePath();
+    this->tempNodes.insert(tempNodes.end(),
+                           nodeGroups[0].begin(),
+                           nodeGroups[0].end());
+    if(this->nodeGroups.size()==1){ //means that there are no obstacles on the line between start and end
+        this->success = true;
+    }
 
-    bool result = false;
     int iterCount = 0;
     while(!this->success && iterCount<=this->max_iter){
         Node *q = getRandomNode();
@@ -51,7 +51,9 @@ bool RRTMult::plan()
 
         ++iterCount;
     }
+    nodes = tempNodes;
     findPath();
+    return this->success;
 }
 
 /**
@@ -96,7 +98,6 @@ void RRTMult::seperateSimplePath()
     this->groupCount = 0;
     vector<Node *> group;
     for(size_t i=0; i<this->simplePath.size()-1; ++i){
-        this->nodes.push_back(simplePath[i]);
         group.push_back(simplePath[i]);
         if( this->isSegInObstacle(simplePath[i], simplePath[i+1]) ){
             do{
@@ -110,6 +111,7 @@ void RRTMult::seperateSimplePath()
             cout << "No obstacle in between " << i << " " << i+1 << endl;
         }
     }
+    nodeGroups.push_back(group);
 }
 
 /**
@@ -214,15 +216,14 @@ void RRTMult::checkConnection(int *groupid, int *nodeid)
  */
 void RRTMult::connectToGroup(int groupid, int nodeid)
 {
-    lastNode->children.push_back(nodeGroups[groupid][nodeid]);
     nodeGroups[groupid][nodeid]->parent = lastNode;
     if(groupid==groupCount){
         this->success = true;
-    }else{
-        tempNodes.insert(tempNodes.end(),
-                         nodeGroups[groupid].begin(),
-                         nodeGroups[groupid].end());
-    }    
+    }
+    tempNodes.insert(tempNodes.end(),
+                     nodeGroups[groupid].begin(),
+                     nodeGroups[groupid].end());
+    nodeGroups.erase(nodeGroups.begin()+groupid);
 }
 
 /**
@@ -231,6 +232,7 @@ void RRTMult::connectToGroup(int groupid, int nodeid)
  */
 void RRTMult::findPath()
 {
+    int iterCount = 0;
     Node *q;
     if(this->success){
         q = *(simplePath.end()-1);
@@ -238,7 +240,8 @@ void RRTMult::findPath()
         q = nearest(this->endPos);
     }
 
-    while(q!=NULL){
+    while(iterCount <= max_iter && q!=NULL){
+        ++iterCount;
         path.push_back(q);
         q = q->parent;
     }

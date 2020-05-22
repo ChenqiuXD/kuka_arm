@@ -5,6 +5,10 @@ This project is written for the graduation program in ZJU. It's a simulation set
 Plus a Qt-based simulation environment in the folder rrt-simulator-master forked from this repo:  
 > https://github.com/sourishg/rrt-simulator  
 
+The repo also includes two new RRT based algorithms which suggests that generating a simple path before RRT exploration would acclerate the speed of path finding. Therefore, a simple and intuitive path is first generated and used to guide the further RRT exploration. An intuitive version is the straight line from the start configuration to the end configuration. After seperated by obstacles, RRT is used to connect the last node and the first node of an adjancent groups. This process is repeated until all the groups are connected.  
+
+Another algorithm which further utilised the RRT exploration is proposed in method 3. We not only use the first node of the later group as end configuration while exploring RRT, rather, we tend to connect different groups of nodes.  
+
 ## Packages and brief introduction
 src  
 ├── kuka_kr6_control  
@@ -17,13 +21,15 @@ src
 ├────── Auto generated moveit_config_package by Moveit! using the urdf file in kuka_kr6_description.  
 ├────── Check for the tutorials about connecting rviz and gazebo for detailed description  
 ├── moveit_planning  
-└────── Motion planning functions. Method list: 1 Moveit built-in functions; 2 rrt; 3 new rrt(unfinished)  
+├────── Motion planning functions. Method list: 1 Moveit built-in functions; 2 rrt; 3 new rrt(unfinished)  
+├──rrt-simulator-master  
+└────── A Qt-based rrt simulation forked from https://github.com/sourishg/rrt-simulator with rrtMult newly written algorithm  
 
 ## Usage
 User currently has three options:  
 1 - use moveit built-in motion planning function;  
-2 - use RRT function written by arthur (unfinished);  
-3 - Learned RRT (not started)  
+2 - use RRT function (unfinished);  
+3 - new RRT-based algorithm (working)  
 
 ### 1 Moveit build-in functions
 After source devel file and use rosdep to install required packages, run the following command  
@@ -38,7 +44,7 @@ The rviz and gazebo should be like:
 > rviz_no_planning.png  
 
 ![Alt text](https://github.com/ChenqiuXD/kuka_arm/blob/master/images/gazebo_no_plann.png)  
-> gazebo_no_plann.png  
+> gazebo_no_planning.png  
 
 
 In the "Displays" panel in the left upper part of rviz, click the MotionPlanning->PlanningRequest->Query Goal State.  
@@ -53,7 +59,7 @@ The effect in rviz and gazebo should be:
 
 
 
-### 2 RRT functions written by arthur (not finished)
+### 2 RRT (not finished)
 After source and install required packages, run following command, to show the gazebo, add the showGazebo param like above.  
 > roslaunch moveit_planning planning_scene.launch useRRT:=true  
 
@@ -73,6 +79,7 @@ visulization_options:
 ├── 1 : visualise the vertices and edges  
 └── 2 : visualise the generation of vertices per sec  
 "maxIter" is an int and thus should not exceed int range.  
+"tolerance" is the angle tolerance to goal in degree.   
 > rosrun moveit_planning rrtPlanner visual 1 maxIter 1000  
 
 When terminal prompted that "Waiting to continue, Press 'next' to plan a path", press the 'next' button on the RvizVisualToolsGui panel in rviz.  
@@ -95,11 +102,20 @@ For maxIter 10000, the search result is as follows
 ## Qt-based simulation
 To run the simulation, open the terminal in the rrt-simulator-master and run  
 > ./build.sh  
+
 Note that you need Qt tools to build the target  
 Then run:  
 > ./bin/rrt-test  
+
 Then please run as the original repository says.
 
+There are three methods implemented in this program. To change methods user need change several variable in the program (still working on it to make it more user-friendly). The basic outcome is as follows:  
+> Original rrt method  
+  
+> Seperate and link seperately  
+  
+> Seperate the simple path and link them 
+
 ## TODO
-1 RRT is not finished therefore the outcome is incorrect  
-2 Design the new algorithm and test it in this platform  
+1 Design the new algorithm and test it in this platform  
+2 Implement the new algorithm in the ROS settings  

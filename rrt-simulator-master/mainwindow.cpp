@@ -8,6 +8,7 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->setupUi(this);
     renderArea = ui->renderArea;
     rrt = renderArea->rrt;
+    rrtMult = renderArea->rrtMult;
     simulated = false;
 }
 
@@ -23,14 +24,17 @@ void MainWindow::on_startButton_clicked()
     }
     simulated = true;
     // get step size and max iterations from GUI.
-    rrt->setMaxIterations(ui->maxIterations->text().toInt());
-    rrt->setStepSize(ui->stepSize->text().toInt());
-
-    assert(rrt->step_size > 0);
-    assert(rrt->max_iter > 0);
+    if(renderArea->planType==0){
+        rrt->setMaxIterations(ui->maxIterations->text().toInt());
+        rrt->setStepSize(ui->stepSize->text().toInt());
+    }else if(renderArea->planType==1){
+        rrtMult->setMaxIterations(ui->maxIterations->text().toInt());
+        rrtMult->setStepSize(ui->stepSize->text().toInt());
+    }
 
     // RRT Algorithm main loop
-    int rrtType = 2;
+    // 1->original RRT, 2->seperate and link RRT, 3->rrtMult
+    int rrtType = 3;
     if(rrtType==1){
         bool success = rrt->plan();
         if(success){ui->statusBox->setText(tr("Reached Destination!"));}
@@ -42,8 +46,8 @@ void MainWindow::on_startButton_clicked()
         rrt->planConnect();
         renderArea->update();
     }else if(rrtType==3){
-        // TODO
-        ;
+        rrtMult->plan();
+        renderArea->update();
     }else{
         cout << "Error: check your rrtType which is: " << rrtType << endl;
     }
@@ -56,16 +60,29 @@ void MainWindow::on_resetButton_clicked()
 {
     simulated = false;
     ui->statusBox->setText(tr(""));
-    rrt->obstacles->obstacles.clear();
-    rrt->obstacles->obstacles.resize(0);
-//    rrt->deleteNodes(rrt->root);
-    rrt->nodes.clear();
-    rrt->nodes.resize(0);
-    rrt->tempNodes.clear();
-    rrt->tempNodes.resize(0);
-    rrt->path.clear();
-    rrt->path.resize(0);
-    rrt->initialize();
+    if(renderArea->planType==0){
+        rrt->obstacles->obstacles.clear();
+        rrt->obstacles->obstacles.resize(0);
+    //    rrt->deleteNodes(rrt->root);
+        rrt->nodes.clear();
+        rrt->nodes.resize(0);
+        rrt->tempNodes.clear();
+        rrt->tempNodes.resize(0);
+        rrt->path.clear();
+        rrt->path.resize(0);
+        rrt->initialize();
+    }else if(renderArea->planType==1){
+        rrtMult->obstacles->obstacles.clear();
+        rrtMult->obstacles->obstacles.resize(0);
+        rrtMult->nodes.clear();
+        rrtMult->nodes.resize(0);
+        rrtMult->tempNodes.clear();
+        rrtMult->tempNodes.resize(0);
+        rrtMult->path.clear();
+        rrtMult->path.resize(0);
+        rrtMult->initialize();
+    }
+
     renderArea->update();
 }
 
