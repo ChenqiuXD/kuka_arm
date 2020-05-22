@@ -5,9 +5,7 @@ This project is written for the graduation program in ZJU. It's a simulation set
 Plus a Qt-based simulation environment in the folder rrt-simulator-master forked from this repo:  
 > https://github.com/sourishg/rrt-simulator  
 
-The repo also includes two new RRT based algorithms which suggests that generating a simple path before RRT exploration would acclerate the speed of path finding. Therefore, a simple and intuitive path is first generated and used to guide the further RRT exploration. An intuitive version is the straight line from the start configuration to the end configuration. After seperated by obstacles, RRT is used to connect the last node and the first node of an adjancent groups. This process is repeated until all the groups are connected.  
-
-Another algorithm which further utilised the RRT exploration is proposed in method 3. We not only use the first node of the later group as end configuration while exploring RRT, rather, we tend to connect different groups of nodes.  
+The repo also includes two new RRT based algorithms which suggests that generating a simple path before RRT exploration would acclerate the speed of path finding. Detailed description could be found in "3 RRT-based algorithm"  
 
 ## Packages and brief introduction
 src  
@@ -91,13 +89,12 @@ For maxIter 10000, the search result is as follows
 ![Alt text](https://github.com/ChenqiuXD/kuka_arm/blob/master/images/maxIter10000.png)  
 > image after 'rosrun moveit_planner rrtPlanner visual 1 maxIter 10000'  
 
-### 3 Learnt RRT
-**TODO**
-
+### 3 RRT-based algorithm  
+**TODO**  
 
 
 ## Working Pipeline Explanation
-**TODO**
+**TODO**  
 
 ## Qt-based simulation
 To run the simulation, open the terminal in the rrt-simulator-master and run  
@@ -110,10 +107,13 @@ Then run:
 Then please run as the original repository says.
 
 There are three methods implemented in this program. To change methods user need change several variable in the program (still working on it to make it more user-friendly). The basic outcome is as follows:  
+![Alt text](https://github.com/ChenqiuXD/kuka_arm/blob/master/images/RRT_original.png)  
 > Original rrt method  
   
-> Seperate and link seperately  
+![Alt text](https://github.com/ChenqiuXD/kuka_arm/blob/master/images/RRT_sep.png)  
+> Seperate and link groups seperately  
   
+![Alt text](https://github.com/ChenqiuXD/kuka_arm/blob/master/images/RRTMult.png)  
 > Seperate the simple path and link them 
 
 ## TODO
