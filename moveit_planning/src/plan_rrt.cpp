@@ -13,19 +13,21 @@
 #include "target_pose_utils.h"
 #include "obstacle_adder.h"
 #include "rrtPlanner.h"
-#include "bi_rrtPlanner.cpp"
+#include "bi_rrtPlanner.h"
+#include "sep_rrtPlanner.h"
 
 using namespace std;
 
 int getrrtType(int argc, char** argv)
 {
-    int rrtTypeResult = 0;
+    int rrtTypeResult = 2;
     for(int i=1;i<argc;++i){
         string paramName = argv[i];
         string paramValue = argv[++i];
         if(paramName=="rrtType"){
             if(paramValue=="0"){rrtTypeResult = 0;}
             else if(paramValue=="1"){rrtTypeResult = 1;}
+            else if(paramValue=="2"){rrtTypeResult = 2;}
             else{ROS_ERROR("Invalid rrt type, recheck your command input");}
         }
     }
@@ -34,7 +36,7 @@ int getrrtType(int argc, char** argv)
 
 int main(int argc, char** argv)
 {    
-    ros::init(argc, argv, "pos_listener");
+    ros::init(argc, argv, "rrt_planner");
     ros::NodeHandle nh;
     ros::AsyncSpinner spinner(1);
     spinner.start();
@@ -59,6 +61,8 @@ int main(int argc, char** argv)
     rrt_planner.getParamFromCommandline(argc, argv);
     bi_rrtPlanner bi_rrt_planner = bi_rrtPlanner(nh, kinematic_model, planning_scene_monitor_);
     bi_rrt_planner.getParamFromCommandline(argc, argv);
+    sep_rrtPlanner sep_rrt_planner = sep_rrtPlanner(nh, kinematic_model, planning_scene_monitor_);
+    sep_rrt_planner.getParamFromCommandline(argc, argv);
 
     // Start moveit visual tools
     namespace rvt = rviz_visual_tools;
@@ -95,13 +99,17 @@ int main(int argc, char** argv)
             }else if(rrtType==1){
                 bi_rrt_planner.setGoalNodeFromPose(target_pose);
                 bi_rrt_planner.setInitialNode(move_group.getCurrentJointValues());
+            }else if(rrtType==2){
+                sep_rrt_planner.setGoalNodeFromPose(target_pose);
+                sep_rrt_planner.setInitialNode(move_group.getCurrentJointValues());
             }
 
             clock_t start, finish;
             start = clock();
             bool success;
             if(rrtType==0){success = rrt_planner.plan();}
-            else if(rrtType==1){success = bi_rrt_planner.plan();}            
+            else if(rrtType==1){success = bi_rrt_planner.plan();}     
+            else if(rrtType==2){success = sep_rrt_planner.plan();}       
             finish = clock();
             double time = (double)(finish-start)/CLOCKS_PER_SEC;
 

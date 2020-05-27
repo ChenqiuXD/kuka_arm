@@ -24,6 +24,9 @@ public:
     ~Obstacle_Adder();
     void obs_callback(const gazebo_msgs::LinkStates::ConstPtr &msg);
     void add_obstacles();
+    moveit_msgs::CollisionObject add_wooden_box();
+    moveit_msgs::CollisionObject add_target();
+    moveit_msgs::CollisionObject add_test_obstacles();
 
     map<string, geometry_msgs::Pose>obs_poses;
     vector<string> obs_names;

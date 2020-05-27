@@ -26,6 +26,7 @@ bool rrtPlanner::plan()
 {
     // Set some parameters i.e. this->success...
     initialize();
+    rrtTree.push_back(initialNode);
 
     // The main plan process, return true if successfully planned.
     int count = 0;
@@ -151,10 +152,6 @@ bool rrtPlanner::checkReachGoal(node newNode)
     distance = calcDist(newNode, goalNodes[0]);
     if(distance < minGoalDist){minGoalDist = distance;}
     if(distance > maxGoalDist){maxGoalDist = distance;}
-    // if(distance > goalTolerance*JOINTNUM){
-    //     result = false;
-    //     break;
-    // }
     for( size_t j=0;j<JOINTNUM;++j ){
         if( abs(newNode.jointAngles[j] -goalNodes[0].jointAngles[j]) >this->goalToleranceVec[j] ){
             result = false;

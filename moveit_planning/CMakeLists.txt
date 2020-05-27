@@ -243,6 +243,17 @@ target_link_libraries(bi_rrtPlanner
   ${catkin_LIBRARIES}
 )
 
+add_library(sep_rrtPlanner
+  include/moveit_planning/sep_rrtPlanner.h
+  src/sep_rrtPlanner.cpp
+  src/rrt_utils.cpp
+)
+add_dependencies(sep_rrtPlanner ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
+target_link_libraries(sep_rrtPlanner
+  rrtPlanner
+  ${catkin_LIBRARIES}
+)
+
 add_library(target_pose_utils
   include/moveit_planning/target_pose_utils.h
   src/target_pose_utils.cpp
@@ -271,15 +282,6 @@ target_link_libraries(plan_rrt
   obstacle_adder
   rrtPlanner
   bi_rrtPlanner
+  sep_rrtPlanner
   ${catkin_LIBRARIES}
 )
-
-# add_executable(bi_rrt
-#   src/moveit_planner_birrt.cpp
-# )
-# add_dependencies(bi_rrt ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
-# target_link_libraries(bi_rrt
-#   obstacle_adder
-#   bi_rrtPlanner
-#   ${catkin_LIBRARIES}
-# )

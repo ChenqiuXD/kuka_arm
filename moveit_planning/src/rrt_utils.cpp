@@ -93,7 +93,6 @@ void rrtPlanner::initialize()
     if(rrtTree.size()!=0){
         rrtTree.clear();
     }
-    rrtTree.push_back(initialNode);
     path.clear();
     minGoalDist = DBL_MAX;
     maxGoalDist = 0;
@@ -168,6 +167,7 @@ void rrtPlanner::drawNewNode(node newNode)
     // Initialize headers and other constant
     points.header.frame_id = line_list.header.frame_id = "/world";
     points.header.stamp = line_list.header.stamp = ros::Time::now();
+    points.ns = line_list.ns = "tree";
 
     geometry_msgs::Point newPoint;
     geometry_msgs::Point prevPoint;
@@ -190,7 +190,9 @@ void rrtPlanner::drawPlan()
 {
     pathVertices.header.frame_id = pathEdges.header.frame_id = "/world";
     pathVertices.header.stamp = pathEdges.header.stamp = ros::Time::now();
+    pathVertices.ns = pathEdges.ns = "path";
     points.header.stamp = line_list.header.stamp = ros::Time::now();
+    points.ns = line_list.ns = "tree";
 
     for(size_t i = 0; i < path.size()-1; ++i){  // -1 is to exempt the initialNode
         node curNode = path[i];
@@ -203,7 +205,7 @@ void rrtPlanner::drawPlan()
         line_list.points.erase( line_list.points.begin() + 2*curNode.id - 1 );
         line_list.points.erase( line_list.points.begin() + 2*curNode.id - 2 );
     }
-    ros::WallDuration sleep_t(0.5);
+    ros::WallDuration sleep_t(0.1);
     markerPub.publish(pathEdges);
     sleep_t.sleep();
     markerPub.publish(pathVertices);
@@ -324,4 +326,30 @@ void rrtPlanner::setParam(string paramName, string paramValue)
 void rrtPlanner::setVisualParam(int visualType)
 {
     this->enableVisual = visualType;
+}
+
+void rrtPlanner::vecInt2Double(vector<int> a, vector<double> *b)
+{
+    if(b->size()==a.size()){
+        for(size_t i=0;i<a.size();++i){
+            (*b)[i] = a[i];
+        }
+    }else if(b->size()==0){
+        for(size_t i=0;i<a.size();++i){
+            b->push_back(a[i]);
+        }
+    }
+}
+
+void rrtPlanner::vecDoub2Int(vector<double> a, vector<int> *b)
+{
+    if(b->size()==a.size()){
+        for(size_t i=0;i<a.size();++i){
+            (*b)[i] = a[i];
+        }
+    }else if(b->size()==0){
+        for(size_t i=0;i<a.size();++i){
+            b->push_back(a[i]);
+        }
+    }
 }

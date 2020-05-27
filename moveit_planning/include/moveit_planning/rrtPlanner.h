@@ -71,6 +71,8 @@ public:
     void getParamFromCommandline(int argc, char** argv);
     void setParam(string paramName, string paramValue);
     void setVisualParam(int visualType);
+    void vecInt2Double(vector<int>, vector<double> *);
+    void vecDoub2Int(vector<double> , vector<int> *);
 
     // Angle tolerance per joint
     double goalTolerance = 3;
@@ -81,7 +83,7 @@ public:
     // between nearestNode and newNode to be check collision
     int FEASI_PIESCES_NUM = 3; 
     // In plan, the maximum of extend iteration
-    int maxIter = 2000;
+    int maxIter = 500;
     // Name of the end-effctor
     string END_EFFECTOR_NAME = "tool0";
     // With probability the tree would extend towards the goal
