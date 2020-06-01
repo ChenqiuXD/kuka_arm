@@ -71,7 +71,7 @@ p, li { white-space: pre-wrap; }
     <property name="geometry">
      <rect>
       <x>400</x>
-      <y>90</y>
+      <y>60</y>
       <width>100</width>
       <height>17</height>
      </rect>
@@ -87,7 +87,7 @@ p, li { white-space: pre-wrap; }
     <property name="geometry">
      <rect>
       <x>400</x>
-      <y>120</y>
+      <y>90</y>
       <width>100</width>
       <height>27</height>
      </rect>
@@ -103,7 +103,7 @@ p, li { white-space: pre-wrap; }
     <property name="geometry">
      <rect>
       <x>400</x>
-      <y>150</y>
+      <y>120</y>
       <width>100</width>
       <height>17</height>
      </rect>
@@ -119,7 +119,7 @@ p, li { white-space: pre-wrap; }
     <property name="geometry">
      <rect>
       <x>400</x>
-      <y>170</y>
+      <y>140</y>
       <width>100</width>
       <height>27</height>
      </rect>
@@ -154,6 +154,38 @@ p, li { white-space: pre-wrap; }
       <y>250</y>
       <width>100</width>
       <height>71</height>
+     </rect>
+    </property>
+   </widget>
+   <widget class="QLabel" name="label_3">
+    <property name="geometry">
+     <rect>
+      <x>396</x>
+      <y>170</y>
+      <width>101</width>
+      <height>20</height>
+     </rect>
+    </property>
+    <property name="sizePolicy">
+     <sizepolicy hsizetype="Expanding" vsizetype="Preferred">
+      <horstretch>0</horstretch>
+      <verstretch>0</verstretch>
+     </sizepolicy>
+    </property>
+    <property name="text">
+     <string>planner type</string>
+    </property>
+    <property name="alignment">
+     <set>Qt::AlignCenter</set>
+    </property>
+   </widget>
+   <widget class="QLineEdit" name="plannerType">
+    <property name="geometry">
+     <rect>
+      <x>400</x>
+      <y>190</y>
+      <width>101</width>
+      <height>27</height>
      </rect>
     </property>
    </widget>

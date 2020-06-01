@@ -34,7 +34,7 @@ void MainWindow::on_startButton_clicked()
 
     // RRT Algorithm main loop
     // 1->original RRT, 2->seperate and link RRT, 3->rrtMult
-    int rrtType = 3;
+    int rrtType = 5;
     if(rrtType==1){
         bool success = rrt->plan();
         if(success){ui->statusBox->setText(tr("Reached Destination!"));}
@@ -47,6 +47,18 @@ void MainWindow::on_startButton_clicked()
         renderArea->update();
     }else if(rrtType==3){
         rrtMult->plan();
+        renderArea->update();
+    }else if(rrtType == 4){
+        bool success = rrt->planBi();
+        rrt->nodes = rrt->tempNodes;
+        rrt->nodes.insert(rrt->nodes.end(), rrt->backTree.begin(), rrt->backTree.end());
+        rrt->findPathBi(success);
+        renderArea->update();
+    }else if(rrtType == 5){
+        bool success = rrt->planBiConnect();
+        rrt->nodes = rrt->tempNodes;
+        rrt->nodes.insert(rrt->nodes.end(), rrt->backTree.begin(), rrt->backTree.end());
+        rrt->findPathBiConnect(success);
         renderArea->update();
     }else{
         cout << "Error: check your rrtType which is: " << rrtType << endl;

@@ -11,6 +11,7 @@
         "*.tcc": "cpp",
         "istream": "cpp",
         "list": "cpp",
-        "unordered_map": "cpp"
+        "unordered_map": "cpp",
+        "random": "cpp"
     }
 }

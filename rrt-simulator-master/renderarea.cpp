@@ -8,7 +8,7 @@ RenderArea::RenderArea(QWidget *parent) : QWidget(parent)
     scribbling = false;
     rrt = new RRT;
     rrtMult = new RRTMult;
-    planType = 1;    // 0->original RRT, 1->multRRT
+    planType = 0;    // 0->original RRT, 1->multRRT
 }
 
 /**
@@ -126,8 +126,10 @@ void RenderArea::drawNodes(QPainter &painter)
     if(planType==0){
         for(int i = 0; i < (int)rrt->path.size() - 1; i++) {
             QPointF p1(rrt->path[i]->position.x(), rrt->path[i]->position.y());
-            QPointF p2(rrt->path[i]->parent->position.x(), rrt->path[i]->parent->position.y());
-            painter.drawLine(p1, p2);
+            if(rrt->path[i]->parent){
+                QPointF p2(rrt->path[i]->parent->position.x(), rrt->path[i]->parent->position.y());
+                painter.drawLine(p1, p2);
+            }
         }
     }else if(planType==1){
         for(int i = 0; i < (int)rrtMult->path.size() - 1; i++) {

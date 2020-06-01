@@ -142,7 +142,15 @@ void sep_rrtPlanner::checkConnection(node newNode, int *groupid, int *nodeid)
 void sep_rrtPlanner::connectToGroup(node *newNode, int groupid, int nodeid)
 {
     nodeGroups[groupid][nodeid].prevNodeid = newNode->id;
-    rrtTree.insert(rrtTree.end(), nodeGroups[groupid].begin(), nodeGroups[groupid].end());
+    nodeGroups[groupid][nodeid].id = rrtTree.size();
+    rrtTree.push_back(nodeGroups[groupid][nodeid]);
+    for(size_t i=0;i<nodeGroups[groupid].size();++i){
+        if(i!=nodeid){
+            nodeGroups[groupid][i].id = rrtTree.size();
+            nodeGroups[groupid][i].prevNodeid = rrtTree.size()-1;
+            rrtTree.push_back(nodeGroups[groupid][i]);
+        }
+    }
     nodeGroups.erase(nodeGroups.begin()+groupid);
 }
 
@@ -163,13 +171,14 @@ void sep_rrtPlanner::drawSimplePath()
     geometry_msgs::Point point;
     geometry_msgs::Point nextPoint;
     for(auto groupIter = nodeGroups.begin(); groupIter!=nodeGroups.end();++groupIter){
-        for(auto nodeIter = groupIter->begin();nodeIter!=groupIter->end()-2;++nodeIter){
+        for(auto nodeIter = groupIter->begin();nodeIter!=groupIter->end()-1;++nodeIter){
             calcNodePose((*nodeIter), &point);
             calcNodePose(*(nodeIter+1), &nextPoint);
             this->points_simple.points.push_back(point);
             this->line_list_simple.points.push_back(point);
             this->line_list_simple.points.push_back(nextPoint);
         }
+        this->points_simple.points.push_back(nextPoint);
     }
 
     points_simple.header.frame_id = line_list_simple.header.frame_id = "/world";

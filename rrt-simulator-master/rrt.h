@@ -56,6 +56,31 @@ public:
     vector<Node *> simplePath;
     vector<Node *> tempNodes;   // Store the nodes calculating while connecting two blocked nodes
     vector<Node *> blockedNodes;
+
+// -------------------------------------------------------------------------
+// Bi-directional RRT
+// -------------------------------------------------------------------------
+    bool planBi();
+    void initBi();
+    Node* nearest(Vector2f point, vector<Node*> tree);
+    void addInBack(Node *qNearest, Node *qNew);
+    bool checkReachGoalBi();
+    void findPathBi(bool);
+
+    vector<Node *> backTree;
+    Node *lastBackNode;
+
+// -------------------------------------------------------------------------
+// RRT-connect
+// -------------------------------------------------------------------------
+    bool planBiConnect();
+    void initBiConnect();
+    void findPathBiConnect(bool success);
+    void connectToBackNode();
+    void connectToForwardNode();
+    void growBackTree(Node*);
+    void growForwardTree(Node*);
+    bool checkReachGoal();
 };
 
 #endif // RRT_H

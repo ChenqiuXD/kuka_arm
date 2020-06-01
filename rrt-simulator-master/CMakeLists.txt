@@ -29,5 +29,7 @@ add_executable(rrt-test
   obstacles.cpp
   renderarea.cpp 
   rrt.cpp  
+  bi_rrt.cpp
+  rrtBiConnect.cpp
   rrtMult.cpp)
 target_link_libraries(rrt-test Qt5::Widgets Qt5::Gui)

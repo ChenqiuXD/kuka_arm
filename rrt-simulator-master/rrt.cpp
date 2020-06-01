@@ -126,6 +126,20 @@ Node* RRT::nearest(Vector2f point)
     return closest;
 }
 
+Node* RRT::nearest(Vector2f point, vector<Node*> tree)
+{
+    float minDist = 1e9;
+    Node *closest = NULL;
+    for(int i = 0; i < (int)tree.size(); i++) {
+        float dist = distance(point, tree[i]->position);
+        if (dist < minDist) {
+            minDist = dist;
+            closest = tree[i];
+        }
+    }
+    return closest;
+}
+
 /**
  * @brief Find a configuration at a distance step_size from nearest node to random node.
  * @param q
