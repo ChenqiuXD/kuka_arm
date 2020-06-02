@@ -23,6 +23,7 @@ bool RRTMult::plan()
     initialize();
     getSimplePath();
     seperateSimplePath();
+    this->groupCount = this->nodeGroups.size()-1;
     this->tempNodes.insert(tempNodes.end(),
                            nodeGroups[0].begin(),
                            nodeGroups[0].end());
@@ -44,7 +45,11 @@ bool RRTMult::plan()
                 int groupid, nodeid;
                 checkConnection(&groupid, &nodeid);
                 if(groupid){
+                    if(groupid==this->groupCount){
+                        this->success = true;
+                    }
                     connectToGroup(groupid, nodeid);
+                    this->groupCount -= 1;
                 }
             }
         }
@@ -83,7 +88,6 @@ void RRTMult::getSimplePath()
         curNode->children.push_back(nextNode);
         nextNode->position = curNode->position + step;
         this->simplePath.push_back(curNode);
-//         cout << "New point is: " << curNode->position(0) << " " << curNode->position(1) << endl;
         curNode = nextNode;
     }
 }
@@ -101,14 +105,12 @@ void RRTMult::seperateSimplePath()
         group.push_back(simplePath[i]);
         if( this->isSegInObstacle(simplePath[i], simplePath[i+1]) ){
             do{
-                cout << "Obstacle in between: " << i << " " << i+1 << endl;
                 ++i;
             }while( !this->isSegInObstacle(simplePath[i], simplePath[i+1]) );
-            this->groupCount += 1;
+            simplePath[i+1]->parent = NULL;
             this->nodeGroups.push_back(group);
             group.clear();
         }else{
-            cout << "No obstacle in between " << i << " " << i+1 << endl;
         }
     }
     nodeGroups.push_back(group);
@@ -191,7 +193,7 @@ void RRTMult::add(Node *qNearest, Node *qNew)
  */
 void RRTMult::checkConnection(int *groupid, int *nodeid)
 {
-    int dist, minDist = 1e9;
+    int dist, prevDist=1e9, minDist = 1e9;
     size_t connectGroupid = 0, minNodeid = 0;
     for(size_t i=1; i<nodeGroups.size(); ++i){
         for(size_t j=0; j<nodeGroups[i].size(); ++j){
@@ -203,6 +205,8 @@ void RRTMult::checkConnection(int *groupid, int *nodeid)
                     minNodeid = j;
                 }
             }
+            if(dist>prevDist){break;}
+            prevDist = dist;
         }
     }
     *groupid = connectGroupid;
@@ -216,14 +220,28 @@ void RRTMult::checkConnection(int *groupid, int *nodeid)
  */
 void RRTMult::connectToGroup(int groupid, int nodeid)
 {
-    nodeGroups[groupid][nodeid]->parent = lastNode;
-    if(groupid==groupCount){
-        this->success = true;
-    }
+    swapRelation(groupid, nodeid);
     tempNodes.insert(tempNodes.end(),
                      nodeGroups[groupid].begin(),
                      nodeGroups[groupid].end());
     nodeGroups.erase(nodeGroups.begin()+groupid);
+}
+
+/**
+ * @brief Swap the parent children relationship from the connected node
+ * @param groupid   : store the connected group num
+ * @param nodeid    : store the connected node num
+ */
+void RRTMult::swapRelation(int groupid, int nodeid)
+{
+    for( size_t nodeCount=nodeid-1; nodeCount > 0; --nodeCount ){
+        nodeGroups[groupid][nodeCount]->children.clear();
+        nodeGroups[groupid][nodeCount]->children.push_back(nodeGroups[groupid][nodeCount-1]);
+        nodeGroups[groupid][nodeCount]->parent = nodeGroups[groupid][nodeCount+1];
+    }
+    nodeGroups[groupid][0]->parent = nodeGroups[groupid][1];
+    nodeGroups[groupid][0]->children.clear();
+    nodeGroups[groupid][nodeid]->parent = lastNode;
 }
 
 /**

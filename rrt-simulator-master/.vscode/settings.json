@@ -12,6 +12,9 @@
         "istream": "cpp",
         "list": "cpp",
         "unordered_map": "cpp",
-        "random": "cpp"
+        "random": "cpp",
+        "qelapsedtimer": "cpp",
+        "chrono": "cpp",
+        "qtimer": "cpp"
     }
 }

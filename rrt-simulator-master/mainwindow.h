@@ -25,6 +25,11 @@ private:
 private slots:
     void on_startButton_clicked();
     void on_resetButton_clicked();
+
+    //Following code are added to test algorithm efficientcy
+    void generateObstacles();
+    void recordTime(double time);
+    void recordLength(int length);
 };
 
 #endif // MAINWINDOW_H

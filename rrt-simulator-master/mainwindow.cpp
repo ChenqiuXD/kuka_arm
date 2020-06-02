@@ -1,5 +1,8 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
+#include <chrono>
+
+using namespace std::chrono;
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
@@ -32,37 +35,50 @@ void MainWindow::on_startButton_clicked()
         rrtMult->setStepSize(ui->stepSize->text().toInt());
     }
 
+    // Following code are used for testing algorithm efficiency
+    generateObstacles();
+    auto start = high_resolution_clock::now();
+    auto stop = high_resolution_clock::now();
+
     // RRT Algorithm main loop
     // 1->original RRT, 2->seperate and link RRT, 3->rrtMult
-    int rrtType = 5;
+    int rrtType = 1;
+    bool success;
     if(rrtType==1){
-        bool success = rrt->plan();
-        if(success){ui->statusBox->setText(tr("Reached Destination!"));}
-        else{ui->statusBox->setText(tr("Exceeded max iterations!"));}
-        rrt->nodes = rrt->tempNodes;
+        success = rrt->plan();
+        // if(success){ui->statusBox->setText(tr("Reached Destination!"));}
+        // else{ui->statusBox->setText(tr("Exceeded max iterations!"));}
         rrt->findPath(success);
+        stop = high_resolution_clock::now();
+        rrt->nodes = rrt->tempNodes;
         renderArea->update();
     }else if(rrtType==2){
-        rrt->planConnect();
+        success = rrt->planConnect();
+        stop = high_resolution_clock::now();
         renderArea->update();
     }else if(rrtType==3){
-        rrtMult->plan();
+        success = rrtMult->plan();
+        stop = high_resolution_clock::now();
         renderArea->update();
     }else if(rrtType == 4){
-        bool success = rrt->planBi();
+        success = rrt->planBi();
+        rrt->findPathBi(success);
+        stop = high_resolution_clock::now();
         rrt->nodes = rrt->tempNodes;
         rrt->nodes.insert(rrt->nodes.end(), rrt->backTree.begin(), rrt->backTree.end());
-        rrt->findPathBi(success);
         renderArea->update();
     }else if(rrtType == 5){
-        bool success = rrt->planBiConnect();
+        success = rrt->planBiConnect();
+        rrt->findPathBiConnect(success);
+        stop = high_resolution_clock::now();
         rrt->nodes = rrt->tempNodes;
         rrt->nodes.insert(rrt->nodes.end(), rrt->backTree.begin(), rrt->backTree.end());
-        rrt->findPathBiConnect(success);
         renderArea->update();
     }else{
         cout << "Error: check your rrtType which is: " << rrtType << endl;
     }
+    auto duration = duration_cast<microseconds>(stop-start);
+    cout << (success?"Successfully":"Failed")<< " to plan with elapsed time is: " << duration.count() << " microseconds" << endl;
 }
 
 /**
@@ -73,8 +89,8 @@ void MainWindow::on_resetButton_clicked()
     simulated = false;
     ui->statusBox->setText(tr(""));
     if(renderArea->planType==0){
-        rrt->obstacles->obstacles.clear();
-        rrt->obstacles->obstacles.resize(0);
+        // rrt->obstacles->obstacles.clear();
+        // rrt->obstacles->obstacles.resize(0);
     //    rrt->deleteNodes(rrt->root);
         rrt->nodes.clear();
         rrt->nodes.resize(0);
@@ -84,8 +100,8 @@ void MainWindow::on_resetButton_clicked()
         rrt->path.resize(0);
         rrt->initialize();
     }else if(renderArea->planType==1){
-        rrtMult->obstacles->obstacles.clear();
-        rrtMult->obstacles->obstacles.resize(0);
+        // rrtMult->obstacles->obstacles.clear();
+        // rrtMult->obstacles->obstacles.resize(0);
         rrtMult->nodes.clear();
         rrtMult->nodes.resize(0);
         rrtMult->tempNodes.clear();
@@ -96,6 +112,43 @@ void MainWindow::on_resetButton_clicked()
     }
 
     renderArea->update();
+}
+
+void MainWindow::generateObstacles()
+{
+    vector<Vector2f> pointPos;
+    pointPos.push_back(Vector2f(120,0));
+    pointPos.push_back(Vector2f(140,100));
+
+    pointPos.push_back(Vector2f(0,100));
+    pointPos.push_back(Vector2f(80,120));
+
+    pointPos.push_back(Vector2f(200,0));
+    pointPos.push_back(Vector2f(220,280));
+
+    // pointPos.push_back(Vector2f(130,160));
+    // pointPos.push_back(Vector2f(150,400));
+
+    pointPos.push_back(Vector2f(250,255));
+    pointPos.push_back(Vector2f(400,275));
+
+    pointPos.push_back(Vector2f(250,320));
+    pointPos.push_back(Vector2f(270,400));
+
+    for(size_t i=0;i<pointPos.size();i+=2){
+        this->renderArea->rrt->obstacles->addObstacle(pointPos[i],pointPos[i+1]);
+        this->renderArea->rrtMult->obstacles->addObstacle(pointPos[i],pointPos[i+1]);
+    }
+}
+
+void MainWindow::recordTime(double time)
+{
+    ;
+}
+
+void MainWindow::recordLength(int length)
+{
+    ;
 }
 
 MainWindow::~MainWindow()

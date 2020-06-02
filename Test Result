@@ -1,0 +1,31 @@
+Form 1
+	Obstacles Format:
+	    pointPos.push_back(Vector2f(120,0));
+	    pointPos.push_back(Vector2f(140,100));
+
+	    pointPos.push_back(Vector2f(0,100));
+	    pointPos.push_back(Vector2f(80,120));
+
+	    pointPos.push_back(Vector2f(200,0));
+	    pointPos.push_back(Vector2f(220,280));
+
+	    pointPos.push_back(Vector2f(130,160));
+	    pointPos.push_back(Vector2f(150,400));
+
+	    pointPos.push_back(Vector2f(250,255));
+	    pointPos.push_back(Vector2f(400,275));
+
+	    pointPos.push_back(Vector2f(250,320));
+	    pointPos.push_back(Vector2f(270,400));
+
+	Result:
+		planner 1 Original RRT:
+			s-27228, f-37353, f-36002, f-12608, f-36987, s-36970, f-40173, f-38271, f-38404, s-28679
+		planner 2 RRT-Seperate-Connect:
+			f-36434, f-39965, f-42713, f-42331, f-42831, s-51503, f-45696, s-50064, f-51818, f-49034
+		Planner 3 RRT-Mult
+			全都fail
+		Planner 4 RRT-bidirectional
+			s-5004, s-2764, s-4873, s-6755, s-6570, s-6530, s-7558, s-8374, s-6093, s-5779, s-21512
+		Planner 5 RRT-Connect
+			s-4821, s-7271, s-5233, s-7123, s-6963, s-6877, s-6203, s-8864, s-8593, s-5957, s-14430

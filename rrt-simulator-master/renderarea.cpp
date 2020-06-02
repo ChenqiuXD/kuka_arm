@@ -174,7 +174,11 @@ void RenderArea::mouseReleaseEvent(QMouseEvent *event)
             rrt->obstacles->addObstacle(Vector2f(lastMouseClickedPoint.x(), lastMouseClickedPoint.y()), Vector2f(curPoint.x(), curPoint.y()));
         }else if(planType==1){
             rrtMult->obstacles->addObstacle(Vector2f(lastMouseClickedPoint.x(), lastMouseClickedPoint.y()), Vector2f(curPoint.x(), curPoint.y()));
-        }        
+        }       
+        // cout << "Start Point :" << endl;
+        // cout << lastMouseClickedPoint.x() << " " << lastMouseClickedPoint.y() << endl; 
+        // cout << "End Point: " << endl;
+        // cout << curPoint.x() << " " << curPoint.y() << endl;
         update();
         scribbling = false;
     }

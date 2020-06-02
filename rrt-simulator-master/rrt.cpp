@@ -217,7 +217,6 @@ bool RRT::planConnect()
     this->getBlockedNodes();
     bool success = true;
     for(size_t i=0;i<this->blockedNodes.size();i+=2){
-        cout << "Connecting " << i << "th blocked node with " << i+1 << "th blocked node" << endl;
         this->setInitNode(this->blockedNodes[i]);
         this->setEndNode(this->blockedNodes[i+1]->position);
         success = this->plan();
@@ -262,7 +261,6 @@ void RRT::getSimplePlan()
         curNode->children.push_back(nextNode);
         nextNode->position = curNode->position + step;
         this->simplePath.push_back(curNode);
-        // cout << "New point is: " << curNode->position(0) << " " << curNode->position(1) << endl;
         curNode = nextNode;
     }
 }
@@ -279,14 +277,12 @@ void RRT::getBlockedNodes()
         if( this->isSegInObstacle(simplePath[i], simplePath[i+1]) ){
             this->blockedNodes.push_back(simplePath[i]);
             do{
-                cout << "Obstacle in between: " << i << " " << i+1 << endl;
                 ++i;
             }while( i<simplePath.size() && !this->isSegInObstacle(simplePath[i], simplePath[i+1]) );
             if(i<=simplePath.size()-1){
                 this->blockedNodes.push_back(simplePath[i+1]);
             }
         }else{
-            cout << "No obstacle in between " << i << " " << i+1 << endl;
             ;
         }
     }

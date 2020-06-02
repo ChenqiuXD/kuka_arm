@@ -17,6 +17,7 @@ public:
     void add(Node *qNearest, Node *qNew);
     void checkConnection(int *groupid, int *nodeid);
     void connectToGroup(int groupid, int nodeid);
+    void swapRelation(int groupid, int nodeid); 
     void findPath();
 
     // util functions
@@ -29,6 +30,7 @@ public:
     vector<Node *> nodes;
     vector<Node *> path;
     Node *root, *lastNode;
+    Node *tempParent;   // Used when connecting to certain node group
     Vector2f startPos, endPos, goalPos;
     int max_iter;
     int step_size;
