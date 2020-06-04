@@ -10,7 +10,7 @@ RRTMult::RRTMult()
     endPos.y() = END_POS_Y;
     goalPos.x() = END_POS_X;
     goalPos.y() = END_POS_Y;
-    step_size = 3;
+    step_size = 8;
     max_iter = 3000;
 }
 
@@ -80,6 +80,7 @@ void RRTMult::initialize()
  */
 void RRTMult::getSimplePath()
 {
+    if(simplePath.size()){return;}  // If simple path already exist, skip
     Node *curNode = new Node;
     curNode->parent = NULL;
     curNode->position = startPos;

@@ -81,6 +81,18 @@ public:
     void growBackTree(Node*);
     void growForwardTree(Node*);
     bool checkReachGoal();
+
+// -------------------------------------------------------------------------
+// RRT-MultConnect
+// -------------------------------------------------------------------------
+    bool planMultConnect();
+    void initMultConnect();
+    void findPathMultConnect(bool);
+    bool getSimplePath();
+    void getForPath();
+    void getBackPath();
+
+    bool success;
 };
 
 #endif // RRT_H

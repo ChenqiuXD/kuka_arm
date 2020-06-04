@@ -14,7 +14,7 @@ TEMPLATE = app
 CONFIG += c++11
 
 SOURCES += main.cpp mainwindow.cpp obstacles.cpp renderarea.cpp rrt.cpp rrtMult.cpp\
-            bi_rrt.cpp rrtBiConnect.cpp
+            bi_rrt.cpp rrtBiConnect.cpp rrtMultConnect.cpp
 
 HEADERS  += constants.h mainwindow.h obstacles.h\
             renderarea.h rrt.h ui_mainwindow.h rrtMult.h

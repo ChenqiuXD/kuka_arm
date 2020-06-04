@@ -39,14 +39,14 @@ void MainWindow::on_startButton_clicked()
     }
 
     // Following code are used for testing algorithm efficiency
-    this->isObsRandom = false;
+    this->isObsRandom = true;
     generateObstacles();
     auto start = high_resolution_clock::now();
     auto stop = high_resolution_clock::now();
 
     // RRT Algorithm main loop
     // 1->original RRT, 2->seperate and link RRT, 3->rrtMult
-    int rrtType = 5;
+    int rrtType = 6;
     bool success;
     if(rrtType==1){
         success = rrt->plan();
@@ -72,6 +72,13 @@ void MainWindow::on_startButton_clicked()
     }else if(rrtType == 5){
         success = rrt->planBiConnect();
         rrt->findPathBiConnect(success);
+        stop = high_resolution_clock::now();
+        rrt->nodes = rrt->tempNodes;
+        rrt->nodes.insert(rrt->nodes.end(), rrt->backTree.begin(), rrt->backTree.end());
+        renderArea->update();
+    }else if(rrtType == 6){
+        success = rrt->planMultConnect();
+        rrt->findPathMultConnect(success);
         stop = high_resolution_clock::now();
         rrt->nodes = rrt->tempNodes;
         rrt->nodes.insert(rrt->nodes.end(), rrt->backTree.begin(), rrt->backTree.end());

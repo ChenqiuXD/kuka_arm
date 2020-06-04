@@ -71,19 +71,32 @@ class Method:
 
 if __name__ == "__main__":
 	filePathFix = ["./obsFixed/overall/1.txt",
-		    "./obsFixed/overall/2.txt",
-		    "./obsFixed/overall/3.txt",
+		       	"./obsFixed/overall/2.txt",
+			"./obsFixed/overall/3.txt",
 			"./obsFixed/overall/4.txt",
-			"./obsFixed/overall/5.txt"]
+			"./obsFixed/overall/5.txt",
+			"./obsFixed/overall/6.txt"]
 	filePathRan = ["./obsRandom/overall/1.txt",
-		    "./obsRandom/overall/2.txt",
-		    "./obsRandom/overall/3.txt",
+		    	"./obsRandom/overall/2.txt",
+		    	"./obsRandom/overall/3.txt",
 			"./obsRandom/overall/4.txt",
-			"./obsRandom/overall/5.txt"]
+			"./obsRandom/overall/5.txt",
+			"./obsRandom/overall/6.txt"]
+	print "\n"
+	print "THE FOLLOWING ARE RANDOM OBSTACLES"
 	print "================================"
 	a = Method()
-	for i in {0,1,2,3,4}:	
+	for i in range(len(filePathRan)):	
 		a.setPath(filePathRan[i])
+		a.doMath()
+		a.printResult()
+		print "================================"
+
+	print "\n" * 3
+	print "THE FOLLOWING ARE FIXED OBSTACLES"
+	print "================================"
+	for i in range(len(filePathFix)):	
+		a.setPath(filePathFix[i])
 		a.doMath()
 		a.printResult()
 		print "================================"
