@@ -15,6 +15,7 @@
         "random": "cpp",
         "qelapsedtimer": "cpp",
         "chrono": "cpp",
-        "qtimer": "cpp"
+        "qtimer": "cpp",
+        "ctime": "cpp"
     }
 }

@@ -278,7 +278,7 @@ void RRT::getBlockedNodes()
             this->blockedNodes.push_back(simplePath[i]);
             do{
                 ++i;
-            }while( i<simplePath.size() && !this->isSegInObstacle(simplePath[i], simplePath[i+1]) );
+            }while( i<simplePath.size()-2 && !this->isSegInObstacle(simplePath[i], simplePath[i+1]) );
             if(i<=simplePath.size()-1){
                 this->blockedNodes.push_back(simplePath[i+1]);
             }

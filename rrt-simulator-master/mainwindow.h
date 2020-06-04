@@ -5,6 +5,7 @@
 #include <QtWidgets/qmainwindow.h>
 #include "renderarea.h"
 #include "rrt.h"
+#include <fstream>
 
 namespace Ui {
 class MainWindow;
@@ -22,14 +23,16 @@ private:
     RRT *rrt;
     RRTMult *rrtMult;
     bool simulated;
+
+    //Following code are added to test algorithm efficientcy
+    void generateObstacles();
+    bool isObsRandom;
+    std::ofstream fout;
 private slots:
     void on_startButton_clicked();
     void on_resetButton_clicked();
 
-    //Following code are added to test algorithm efficientcy
-    void generateObstacles();
-    void recordTime(double time);
-    void recordLength(int length);
+
 };
 
 #endif // MAINWINDOW_H

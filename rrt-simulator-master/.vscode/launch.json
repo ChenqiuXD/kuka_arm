@@ -24,7 +24,7 @@
             ],
             "preLaunchTask": "gcc build active file",
             "miDebuggerPath": "/usr/bin/gdb",
-            "visualizerFile": "/home/davlee/.config/Code/User/workspaceStorage/dd1ed8c38e93d0fdc71d26c841485f5d/tonka3000.qtvsctools/qt.natvis.xml"
+            "visualizerFile": "/home/davlee/.config/Code/User/workspaceStorage/c36b0649993840e395ecbb748d4dc4da/tonka3000.qtvsctools/qt.natvis.xml"
         }
     ]
 }

@@ -23,10 +23,14 @@ bool RRTMult::plan()
     initialize();
     getSimplePath();
     seperateSimplePath();
+    
+    // for(int i=0;i<this->nodeGroups.size();++i){
+    //     this->nodes.insert(nodes.end(), nodeGroups[i].begin(), nodeGroups[i].end());
+    // }
+    // return false;
+
     this->groupCount = this->nodeGroups.size()-1;
-    this->tempNodes.insert(tempNodes.end(),
-                           nodeGroups[0].begin(),
-                           nodeGroups[0].end());
+    this->tempNodes = nodeGroups[0];
     if(this->nodeGroups.size()==1){ //means that there are no obstacles on the line between start and end
         this->success = true;
     }
@@ -81,7 +85,7 @@ void RRTMult::getSimplePath()
     curNode->position = startPos;
     Vector2f intermediate = endPos - startPos;
     Vector2f step = this->step_size * intermediate / intermediate.norm();
-    
+
     while(curNode->position(0) < goalPos(0)){
         Node *nextNode = new Node;
         nextNode->parent = curNode;
@@ -106,7 +110,7 @@ void RRTMult::seperateSimplePath()
         if( this->isSegInObstacle(simplePath[i], simplePath[i+1]) ){
             do{
                 ++i;
-            }while( !this->isSegInObstacle(simplePath[i], simplePath[i+1]) );
+            }while( !this->isSegInObstacle(simplePath[i], simplePath[i+1]) && i<this->simplePath.size()-2);
             simplePath[i+1]->parent = NULL;
             this->nodeGroups.push_back(group);
             group.clear();
@@ -220,7 +224,11 @@ void RRTMult::checkConnection(int *groupid, int *nodeid)
  */
 void RRTMult::connectToGroup(int groupid, int nodeid)
 {
-    swapRelation(groupid, nodeid);
+    if(nodeid!=0){
+        swapRelation(groupid, nodeid);
+    }else{
+        nodeGroups[groupid][nodeid]->parent = this->lastNode;
+    }
     tempNodes.insert(tempNodes.end(),
                      nodeGroups[groupid].begin(),
                      nodeGroups[groupid].end());
