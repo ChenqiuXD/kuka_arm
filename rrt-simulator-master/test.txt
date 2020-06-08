@@ -1,0 +1,5 @@
+s time: 1506
+s time: 800
+s time: 716
+s time: 1410
+s time: 1205

@@ -83,7 +83,7 @@ public:
     // between nearestNode and newNode to be check collision
     int FEASI_PIESCES_NUM = 3; 
     // In plan, the maximum of extend iteration
-    int maxIter = 500;
+    int maxIter = 3000;
     // Name of the end-effctor
     string END_EFFECTOR_NAME = "tool0";
     // With probability the tree would extend towards the goal

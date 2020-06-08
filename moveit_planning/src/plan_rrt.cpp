@@ -20,14 +20,14 @@ using namespace std;
 
 int getrrtType(int argc, char** argv)
 {
-    int rrtTypeResult = 2;
+    int rrtTypeResult = 1;
     for(int i=1;i<argc;++i){
         string paramName = argv[i];
         string paramValue = argv[++i];
         if(paramName=="rrtType"){
-            if(paramValue=="0"){rrtTypeResult = 0;}
-            else if(paramValue=="1"){rrtTypeResult = 1;}
-            else if(paramValue=="2"){rrtTypeResult = 2;}
+            if(paramValue=="0"){rrtTypeResult = 0;}         // Original RRT
+            else if(paramValue=="1"){rrtTypeResult = 1;}    // Bi-directional RRT
+            else if(paramValue=="2"){rrtTypeResult = 2;}    // Seperate RRT
             else{ROS_ERROR("Invalid rrt type, recheck your command input");}
         }
     }
@@ -116,12 +116,7 @@ int main(int argc, char** argv)
             if(success){
                 moveit::planning_interface::MoveGroupInterface::Plan my_plan;
                 // rrt_planner.generatePlanMsg(time, &my_plan);
-
-                cout << "Trying to get robot_state trajectory" << endl;
-                ROS_INFO_NAMED("tutorial", "Visualizing plan 1 as trajectory line");
-                visual_tools.publishAxisLabeled(target_pose, "pose1");
-                visual_tools.publishTrajectoryLine(my_plan.trajectory_, joint_model_group);
-                visual_tools.trigger();
+                cout << "After " << time << " secs of search, successfully found plan." << endl;
             }else{
                 cout << "After " << time << " secs of search, no available plan is found." << endl;
             }

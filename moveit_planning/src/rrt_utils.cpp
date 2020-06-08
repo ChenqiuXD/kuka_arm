@@ -115,6 +115,7 @@ void rrtPlanner::initrrtVisual()
     line_list.id = 1;
     points.type = visualization_msgs::Marker::POINTS;
     line_list.type = visualization_msgs::Marker::LINE_LIST;
+    points.ns = line_list.ns = "tree";
 
     // Size of points and width of lines.
     points.scale.x = 0.002;
@@ -136,6 +137,7 @@ void rrtPlanner::initPathVisual()
     pathEdges.points.clear();
     pathVertices.header.frame_id = pathEdges.header.frame_id = "/world";
     pathVertices.header.stamp = pathEdges.header.stamp = ros::Time::now();
+    pathVertices.ns = pathEdges.ns = "path";
 
     markerPub.publish(pathVertices);
     markerPub.publish(pathEdges);
