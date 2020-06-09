@@ -42,7 +42,7 @@ bool bi_rrtPlanner::plan()
         }      
 
         if(this->backwrdTree.size()==1){
-            cout << "Backtree is one";
+            cout << "Backtree is one" << endl;
         }
 
         cout << "Current node forwrdTree count: " << forwrdTree.size() << " backwrdTree: " << backwrdTree.size() << endl;
@@ -181,13 +181,13 @@ void bi_rrtPlanner::findPath()
     node forNode, backNode;
     forNode = this->lastFrdNode;
     backNode = this->lastBackNode;
-    while(forNode.prevNodeid != -1){
-        this->path.push_back(forNode);
-        forNode = this->forwrdTree[forNode.prevNodeid];
-    }
     while(backNode.prevNodeid != -1){
         this->path.push_back(backNode);
         backNode = this->backwrdTree[backNode.prevNodeid];
+    }
+    while(forNode.prevNodeid != -1){
+        this->path.push_back(forNode);
+        forNode = this->forwrdTree[forNode.prevNodeid];
     }
 }
 
@@ -238,15 +238,15 @@ void bi_rrtPlanner::drawPlan()
     pathVertices.ns = pathEdges.ns = "path";
     points.header.stamp = line_list.header.stamp = ros::Time::now();
     points.ns = line_list.ns = "tree";
-    // pathEdges.type = visualization_msgs::Marker::LINE_LIST;
+    pathEdges.type = visualization_msgs::Marker::LINE_LIST;
 
     geometry_msgs::Point firstFrdPose, firstBackPose;
     for(size_t i = 0; i < path.size(); ++i){ 
         node curNode = path[i];
         node prevNode;
-        if(curNode.prevNodeid==0){
-            // if(i<path.size()-1){calcNodePose(path[i+1], &firstBackPose);}
-            continue;
+        if(curNode.prevNodeid==0 && i < path.size()-1){
+            calcNodePose(path[i+1], &firstFrdPose);
+            cout << "Entering next path" << endl;
         }
         if(curNode.cluster_id==0){
             prevNode = forwrdTree[curNode.prevNodeid];
@@ -259,10 +259,13 @@ void bi_rrtPlanner::drawPlan()
         calcNodePose(curNode, &pointPose);
         calcNodePose(prevNode, &prevPointPose);
         pathEdges.points.push_back(pointPose);
+        pathEdges.points.push_back(prevPointPose);
         pathVertices.points.push_back(pointPose);
-        pathVertices.points.push_back(prevPointPose);
 
-        // if(i==0){firstFrdPose = pointPose;}
+        if(i==0){
+            firstBackPose = pointPose;
+        }
+        cout << "Connecting " << curNode.cluster_id << " " << curNode.id << " with " << prevNode.id << " nodes. " << endl;
 
         if(curNode.cluster_id==0){
             points.points.erase( points.points.begin() + curNode.id - 1 );
@@ -274,8 +277,8 @@ void bi_rrtPlanner::drawPlan()
             line_list_bck.points.erase( line_list_bck.points.begin() + 2*curNode.id - 2 );
         }    
     }
-    // pathVertices.points.push_back(firstFrdPose);
-    // pathVertices.points.push_back(firstBackPose);
+    pathEdges.points.push_back(firstFrdPose);
+    pathEdges.points.push_back(firstBackPose);
 
     ros::WallDuration sleep_t(0.1);
     markerPub.publish(pathEdges);

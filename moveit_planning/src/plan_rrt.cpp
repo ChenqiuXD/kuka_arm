@@ -93,14 +93,18 @@ int main(int argc, char** argv)
             cout << "The orientation are: " << target_pose.orientation.x << " " << target_pose.orientation.y << " " << target_pose.orientation.z << " " << target_pose.orientation.w << endl;
             cout << "The translations are: " << target_pose.position.x << " " << target_pose.position.y << " " << target_pose.position.z << endl;        
 
+            vector<double> jointPosition{-0.170868, 0.592920, 0.298936, -0.000792, 0.042167, 0};
             if(rrtType==0){
-                rrt_planner.setGoalNodeFromPose(target_pose);
+                // rrt_planner.setGoalNodeFromPose(target_pose);
+                rrt_planner.setGoalNode(jointPosition);
                 rrt_planner.setInitialNode(move_group.getCurrentJointValues());
             }else if(rrtType==1){
-                bi_rrt_planner.setGoalNodeFromPose(target_pose);
+                // bi_rrt_planner.setGoalNodeFromPose(target_pose);
+                bi_rrt_planner.setGoalNode(jointPosition);
                 bi_rrt_planner.setInitialNode(move_group.getCurrentJointValues());
             }else if(rrtType==2){
-                sep_rrt_planner.setGoalNodeFromPose(target_pose);
+                // sep_rrt_planner.setGoalNodeFromPose(target_pose);
+                sep_rrt_planner.setGoalNode(jointPosition);
                 sep_rrt_planner.setInitialNode(move_group.getCurrentJointValues());
             }
 
