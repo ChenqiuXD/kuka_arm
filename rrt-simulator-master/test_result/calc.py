@@ -75,13 +75,15 @@ if __name__ == "__main__":
 			"./obsFixed/overall/3.txt",
 			"./obsFixed/overall/4.txt",
 			"./obsFixed/overall/5.txt",
-			"./obsFixed/overall/6.txt"]
+			"./obsFixed/overall/6.txt",
+			"./obsFixed/overall/7.txt"]
 	filePathRan = ["./obsRandom/overall/1.txt",
 		    	"./obsRandom/overall/2.txt",
 		    	"./obsRandom/overall/3.txt",
 			"./obsRandom/overall/4.txt",
 			"./obsRandom/overall/5.txt",
-			"./obsRandom/overall/6.txt"]
+			"./obsRandom/overall/6.txt",
+			"./obsRandom/overall/7.txt"]
 	print "\n"
 	print "THE FOLLOWING ARE RANDOM OBSTACLES"
 	print "================================"

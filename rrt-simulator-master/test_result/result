@@ -1,0 +1,79 @@
+THE FOLLOWING ARE RANDOM OBSTACLES
+================================
+Calculating data from file path: ./obsRandom/overall/1.txt
+Success times:  200 Failed times:  0
+Avr:  [6671, None] Cov:  [17154992, 0]
+maxTime:  [22239, 0] minTime:  [1515, inf]
+================================
+Calculating data from file path: ./obsRandom/overall/2.txt
+Success times:  37 Failed times:  63
+Avr:  [5237, 26795] Cov:  [50831327, 165747546]
+maxTime:  [29951, 64380] minTime:  [123, 4121]
+================================
+Calculating data from file path: ./obsRandom/overall/3.txt
+Success times:  200 Failed times:  0
+Avr:  [2215, None] Cov:  [4118545, 0]
+maxTime:  [13463, 0] minTime:  [94, inf]
+================================
+Calculating data from file path: ./obsRandom/overall/4.txt
+Success times:  200 Failed times:  0
+Avr:  [890, None] Cov:  [543058, 0]
+maxTime:  [4343, 0] minTime:  [77, inf]
+================================
+Calculating data from file path: ./obsRandom/overall/5.txt
+Success times:  200 Failed times:  0
+Avr:  [759, None] Cov:  [558142, 0]
+maxTime:  [4677, 0] minTime:  [107, inf]
+================================
+Calculating data from file path: ./obsRandom/overall/6.txt
+Success times:  100 Failed times:  0
+Avr:  [975, None] Cov:  [788746, 0]
+maxTime:  [4370, 0] minTime:  [161, inf]
+================================
+Calculating data from file path: ./obsRandom/overall/7.txt
+Success times:  100 Failed times:  0
+Avr:  [2099, None] Cov:  [3911666, 0]
+maxTime:  [9433, 0] minTime:  [267, inf]
+================================
+
+
+
+
+THE FOLLOWING ARE FIXED OBSTACLES
+================================
+Calculating data from file path: ./obsFixed/overall/1.txt
+Success times:  92 Failed times:  8
+Avr:  [7558, 26758] Cov:  [41778740, 187691771]
+maxTime:  [34394, 44484] minTime:  [907, 5734]
+================================
+Calculating data from file path: ./obsFixed/overall/2.txt
+Success times:  96 Failed times:  4
+Avr:  [22001, 34381] Cov:  [93738297, 15775565]
+maxTime:  [45741, 39416] minTime:  [6465, 29798]
+================================
+Calculating data from file path: ./obsFixed/overall/3.txt
+Success times:  100 Failed times:  0
+Avr:  [6755, None] Cov:  [25067966, 0]
+maxTime:  [24402, 0] minTime:  [1118, inf]
+================================
+Calculating data from file path: ./obsFixed/overall/4.txt
+Success times:  100 Failed times:  0
+Avr:  [1016, None] Cov:  [537298, 0]
+maxTime:  [5636, 0] minTime:  [263, inf]
+================================
+Calculating data from file path: ./obsFixed/overall/5.txt
+Success times:  100 Failed times:  0
+Avr:  [723, None] Cov:  [69671, 0]
+maxTime:  [1792, 0] minTime:  [155, inf]
+================================
+Calculating data from file path: ./obsFixed/overall/6.txt
+Success times:  100 Failed times:  0
+Avr:  [734, None] Cov:  [52103, 0]
+maxTime:  [1453, 0] minTime:  [315, inf]
+================================
+Calculating data from file path: ./obsFixed/overall/7.txt
+Success times:  99 Failed times:  0
+Avr:  [4827, None] Cov:  [6465341, 0]
+maxTime:  [16181, 0] minTime:  [1147, inf]
+================================
+

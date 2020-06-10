@@ -60,7 +60,6 @@ bool RRTMult::plan()
 
         ++iterCount;
     }
-    nodes = tempNodes;
     findPath();
     return this->success;
 }

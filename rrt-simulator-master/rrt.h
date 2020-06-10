@@ -93,6 +93,25 @@ public:
     void getBackPath();
 
     bool success;
+
+// -------------------------------------------------------------------------
+// RRT-MultAdvance
+// -------------------------------------------------------------------------
+    bool planMultAdvance();
+    void initMultAdvance();
+    void findPathMultAdvance(bool);
+    void getSimplePaths();
+    void seperatePaths();   
+    vector<vector<Node *>> dividePath(vector<Node *>);
+    void checkConnection(int *, int *);
+    void connectToGroup(int, int);
+    void swapRelation(int groupid, int nodeid);
+
+    int groupCount; 
+    // vector<int> avaiableGroup;
+    vector< vector<Node *> > nodeGroups;
+    vector< vector<Node *> > simplePaths;
+    Node *goalNode;
 };
 
 #endif // RRT_H

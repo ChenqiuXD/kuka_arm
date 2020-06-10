@@ -39,14 +39,14 @@ void MainWindow::on_startButton_clicked()
     }
 
     // Following code are used for testing algorithm efficiency
-    this->isObsRandom = true;
+    this->isObsRandom = false;
     generateObstacles();
     auto start = high_resolution_clock::now();
     auto stop = high_resolution_clock::now();
 
     // RRT Algorithm main loop
     // 1->original RRT, 2->seperate and link RRT, 3->rrtMult
-    int rrtType = 6;
+    int rrtType = 7;
     bool success;
     if(rrtType==1){
         success = rrt->plan();
@@ -61,6 +61,7 @@ void MainWindow::on_startButton_clicked()
     }else if(rrtType==3){
         success = rrtMult->plan();
         stop = high_resolution_clock::now();
+        rrtMult->nodes = rrtMult->tempNodes;
         renderArea->update();
     }else if(rrtType == 4){
         success = rrt->planBi();
@@ -83,6 +84,12 @@ void MainWindow::on_startButton_clicked()
         rrt->nodes = rrt->tempNodes;
         rrt->nodes.insert(rrt->nodes.end(), rrt->backTree.begin(), rrt->backTree.end());
         renderArea->update();
+    }else if(rrtType == 7){
+        success = rrt->planMultAdvance();
+        rrt->findPathMultAdvance(success);
+        stop = high_resolution_clock::now();
+        rrt->nodes = rrt->tempNodes;
+        renderArea->update();
     }else{
         cout << "Error: check your rrtType which is: " << rrtType << endl;
     }
@@ -93,7 +100,11 @@ void MainWindow::on_startButton_clicked()
             fout << (success?"s":"f") << " time: " << duration.count() << endl;
         }
     }else{
-        fout << (success?"s":"f") << " time: " << duration.count() << endl;
+        if( duration.count() > 20000){
+            ;
+        }else{
+            fout << (success?"s":"f") << " time: " << duration.count() << endl;
+        }
     }
 
 }

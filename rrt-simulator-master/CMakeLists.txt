@@ -35,5 +35,6 @@ add_executable(rrt-test
   bi_rrt.cpp
   rrtBiConnect.cpp
   rrtMult.cpp
-  rrtMultConnect.cpp)
+  rrtMultConnect.cpp
+  rrtMultAdvance.cpp)
 target_link_libraries(rrt-test Qt5::Widgets Qt5::Gui)
