@@ -14,20 +14,22 @@
 #include "obstacle_adder.h"
 #include "rrtPlanner.h"
 #include "bi_rrtPlanner.h"
+#include "rrtConnectPlanner.h"
 #include "sep_rrtPlanner.h"
 
 using namespace std;
 
 int getrrtType(int argc, char** argv)
 {
-    int rrtTypeResult = 1;
+    int rrtTypeResult = 2;
     for(int i=1;i<argc;++i){
         string paramName = argv[i];
         string paramValue = argv[++i];
         if(paramName=="rrtType"){
             if(paramValue=="0"){rrtTypeResult = 0;}         // Original RRT
             else if(paramValue=="1"){rrtTypeResult = 1;}    // Bi-directional RRT
-            else if(paramValue=="2"){rrtTypeResult = 2;}    // Seperate RRT
+            else if(paramValue=="2"){rrtTypeResult = 2;}    // RRT-Connect
+            else if(paramValue=="3"){rrtTypeResult = 3;}    // Seperate RRT
             else{ROS_ERROR("Invalid rrt type, recheck your command input");}
         }
     }
@@ -61,6 +63,8 @@ int main(int argc, char** argv)
     rrt_planner.getParamFromCommandline(argc, argv);
     bi_rrtPlanner bi_rrt_planner = bi_rrtPlanner(nh, kinematic_model, planning_scene_monitor_);
     bi_rrt_planner.getParamFromCommandline(argc, argv);
+    rrtConnectPlanner rrt_connect_planner = rrtConnectPlanner(nh, kinematic_model, planning_scene_monitor_);
+    rrt_connect_planner.getParamFromCommandline(argc, argv);
     sep_rrtPlanner sep_rrt_planner = sep_rrtPlanner(nh, kinematic_model, planning_scene_monitor_);
     sep_rrt_planner.getParamFromCommandline(argc, argv);
 
@@ -103,6 +107,10 @@ int main(int argc, char** argv)
                 bi_rrt_planner.setGoalNode(jointPosition);
                 bi_rrt_planner.setInitialNode(move_group.getCurrentJointValues());
             }else if(rrtType==2){
+                // rrt_connect_planner.setGoalNodeFromPose(target_pose);
+                rrt_connect_planner.setGoalNode(jointPosition);
+                rrt_connect_planner.setInitialNode(move_group.getCurrentJointValues());
+            }else if(rrtType==3){
                 // sep_rrt_planner.setGoalNodeFromPose(target_pose);
                 sep_rrt_planner.setGoalNode(jointPosition);
                 sep_rrt_planner.setInitialNode(move_group.getCurrentJointValues());
@@ -113,7 +121,8 @@ int main(int argc, char** argv)
             bool success;
             if(rrtType==0){success = rrt_planner.plan();}
             else if(rrtType==1){success = bi_rrt_planner.plan();}     
-            else if(rrtType==2){success = sep_rrt_planner.plan();}       
+            else if(rrtType==2){success = rrt_connect_planner.plan();}
+            else if(rrtType==3){success = sep_rrt_planner.plan();}       
             finish = clock();
             double time = (double)(finish-start)/CLOCKS_PER_SEC;
 

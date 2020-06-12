@@ -70,7 +70,7 @@ node rrtPlanner::sampleNode()
     random_device rd;
 
     // if goalExtend, then 5 percent probability that the randNode is set to the goalNode
-    if(this->goalExtend && rd()%100 < 3){
+    if(this->goalExtend && rd()%100 < 10){
         // Sample a goal node in goalNodes. Currently only one node, therefore abandoned
         // int goalId = rd() % this->goalNodes.size();
         // randNode = goalNodes[goalId]; 
@@ -163,7 +163,15 @@ bool rrtPlanner::checkReachGoal(node newNode)
 
 bool rrtPlanner::checkFeasbility(node nearestNode, node newNode)
 {
-    // Check the straight line between the nearest node and the new node.
+    // Check angle max and min
+    for(int i=0;i<JOINTNUM;++i){
+        if(newNode.jointAngles[i]>jointUpperLimits[i] || newNode.jointAngles[i]<jointLowerLimits[i]){
+            cout << "The angle of " << i << "th joint is out of limit." << endl;
+            return false;
+        }
+    }
+
+    // Check collision
     collision_detection::CollisionRequest collision_request;
     collision_detection::CollisionResult collision_result;
     collision_result.clear();

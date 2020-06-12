@@ -273,6 +273,15 @@ target_link_libraries(plan_moveit
   ${catkin_LIBRARIES}
 )
 
+add_library(rrtConnectPlanner
+  include/moveit_planning/rrtConnectPlanner.h
+  src/rrtConnectPlanner.cpp
+)
+add_dependencies(rrtConnectPlanner ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
+target_link_libraries(rrtConnectPlanner
+  ${catkin_LIBRARIES}
+)
+
 add_executable(plan_rrt
   src/plan_rrt.cpp
 )
@@ -283,5 +292,7 @@ target_link_libraries(plan_rrt
   rrtPlanner
   bi_rrtPlanner
   sep_rrtPlanner
+  rrtConnectPlanner
   ${catkin_LIBRARIES}
 )
+

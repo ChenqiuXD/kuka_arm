@@ -12,6 +12,7 @@ class bi_rrtPlanner : public rrtPlanner
                       planning_scene_monitor::PlanningSceneMonitorPtr planning_scene_monitor_);
         
         // bi_RRT core functions
+        node sampleNode();
         void growFrdTree(node);
         void growBackTree(node);
         node extend(int id, node randNode, int type);   // type: 0 -> forward, 1 -> backward
@@ -25,8 +26,8 @@ class bi_rrtPlanner : public rrtPlanner
         void initBacktreeVisual();
         void drawNewNode(node);
 
-        vector<node> forwrdTree;
-        vector<node> backwrdTree;
+        vector<node> forwardTree;
+        vector<node> backwardTree;
         node lastFrdNode;
         node lastBackNode;
         visualization_msgs::Marker points_bck;

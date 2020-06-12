@@ -5,9 +5,18 @@ bool RRT::planMultAdvance()
     this->success = false;
     initMultAdvance();
     getSimplePaths();
+    
+    // For demonstration utils, the following lines should be commented when normally functioning
+    // P.S. to see the effect of following lines, you have to change mainWindow as well
+    // for(size_t i=0;i<this->simplePaths.size();++i){
+    //     nodes.insert(nodes.end(), simplePaths[i].begin(), simplePaths[i].end());
+    // }
+    // return true;
+
     seperatePaths();
     this->goalNode =*((nodeGroups.end()-1)->end()-1);
 
+    // For demonstration utils, the following lines should be commented when normally functioning
     // for(size_t i=0;i<this->nodeGroups.size();++i){
     //     nodes.insert(nodes.begin(), nodeGroups[i].begin(), nodeGroups[i].end());
     // }

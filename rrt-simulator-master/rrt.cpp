@@ -89,7 +89,6 @@ Node* RRT::getRandomNode()
     if (point.x() >= 0 && point.x() <= WORLD_WIDTH && point.y() >= 0 && point.y() <= WORLD_HEIGHT) {
         ret = new Node;
         ret->position = point;
-        // cout << "random points: " << ret->position[0] << " " << ret->position[1] << endl;
         return ret;
     }
     return NULL;

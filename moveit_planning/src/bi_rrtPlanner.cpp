@@ -41,11 +41,7 @@ bool bi_rrtPlanner::plan()
             this->success = true;
         }      
 
-        if(this->backwrdTree.size()==1){
-            cout << "Backtree is one" << endl;
-        }
-
-        cout << "Current node forwrdTree count: " << forwrdTree.size() << " backwrdTree: " << backwrdTree.size() << endl;
+        cout << "Current node forwardTree count: " << forwardTree.size() << " backwardTree: " << backwardTree.size() << endl;
         count += 1;
     }
     if(this->success){
@@ -59,18 +55,18 @@ bool bi_rrtPlanner::plan()
 
 void bi_rrtPlanner::initialize()
 {
-    // initialize the backwrdTree
+    // initialize the backwardTree
     // Remember to add cluster_id to the nodes
-    forwrdTree.clear();
-    backwrdTree.clear();
+    forwardTree.clear();
+    backwardTree.clear();
     initialNode.cluster_id = 0;
     initialNode.prevNodeid = -1;
     lastFrdNode = initialNode;
-    forwrdTree.push_back(initialNode);
+    forwardTree.push_back(initialNode);
     goalNodes[0].cluster_id = 1;
     goalNodes[0].prevNodeid = -1;
     lastBackNode = goalNodes[0];
-    backwrdTree.push_back(goalNodes[0]);
+    backwardTree.push_back(goalNodes[0]);
 
     path.clear();
     minGoalDist = DBL_MAX;
@@ -82,21 +78,39 @@ void bi_rrtPlanner::initialize()
     initPathVisual();
 }
 
+node bi_rrtPlanner::sampleNode()
+{
+    // Randomly sample a node in the configuration space
+    int jointAng;
+    node randNode;
+    randNode.prevNodeid = -1;
+    srand(time(NULL));
+    random_device rd;
+
+    // if goalExtend, then 5 percent probability that the randNode is set to the goalNode
+    for(int i=0; i<JOINTNUM; i++){
+        jointAng = rd() % (jointUpperLimits[i]-jointLowerLimits[i]) + jointLowerLimits[i];
+        randNode.jointAngles.push_back(jointAng);
+    }
+    
+    return randNode;
+}
+
 void bi_rrtPlanner::growFrdTree(node randNode)
 {
-    int nearestNodeid = findNearest(randNode, forwrdTree);
+    int nearestNodeid = findNearest(randNode, forwardTree);
     node newFrdNode = extend(nearestNodeid, randNode, 0);
     if(newFrdNode.id != -1){    // if this node is feasible
         newFrdNode.cluster_id = 0;
-        forwrdTree.push_back(newFrdNode);
+        forwardTree.push_back(newFrdNode);
         lastFrdNode = newFrdNode;
         drawNewNode(newFrdNode);
 
-        nearestNodeid = findNearest(newFrdNode, backwrdTree);
+        nearestNodeid = findNearest(newFrdNode, backwardTree);
         node newBckNode = extend(nearestNodeid, newFrdNode, 1);
         if(newBckNode.id != -1){    // if this node is feasible
             newBckNode.cluster_id = 1;
-            backwrdTree.push_back(newBckNode);
+            backwardTree.push_back(newBckNode);
             lastBackNode = newBckNode;
             drawNewNode(newBckNode);
         }
@@ -105,38 +119,31 @@ void bi_rrtPlanner::growFrdTree(node randNode)
 
 void bi_rrtPlanner::growBackTree(node randNode)
 {
-    int nearestNodeid = findNearest(randNode, backwrdTree);
+    int nearestNodeid = findNearest(randNode, backwardTree);
     node newBckNode = extend(nearestNodeid, randNode, 1);
     if(newBckNode.id != -1){    // if this node is feasible
         newBckNode.cluster_id = 1;
-        backwrdTree.push_back(newBckNode);
+        backwardTree.push_back(newBckNode);
         lastBackNode = newBckNode;
         drawNewNode(newBckNode);
 
-        nearestNodeid = findNearest(newBckNode, forwrdTree);
+        nearestNodeid = findNearest(newBckNode, forwardTree);
         node newFrdNode = extend(nearestNodeid, newBckNode, 0);
         if(newFrdNode.id != -1){    // if this node is feasible
             newFrdNode.cluster_id = 0;
-            forwrdTree.push_back(newFrdNode);
+            forwardTree.push_back(newFrdNode);
             lastFrdNode = newFrdNode;
             drawNewNode(newFrdNode);
         }
     }
 }
 
-node bi_rrtPlanner::extend(int id, node randNode, int type)
+node bi_rrtPlanner::extend(int id, node randNode, int cluster_id)
 { 
-    node newNode;    
-    // Check the feasibility and extend the node
-    if(id==-1){
-        ROS_ERROR("Nearest node's id is -1, check the size of tree");
-        newNode.id = -1;
-        return newNode;
-    }
-
+    node newNode; 
     node nearestNode;
-    if(type==0){nearestNode = forwrdTree[id];}
-    else if(type==1){nearestNode = backwrdTree[id];}   
+    if(cluster_id==0){nearestNode = forwardTree[id];}
+    else if(cluster_id==1){nearestNode = backwardTree[id];}   
 
     double distance = calcDist(nearestNode, randNode);
     double step = STEP*JOINTNUM;
@@ -154,8 +161,8 @@ node bi_rrtPlanner::extend(int id, node randNode, int type)
     bool isFeasible = checkFeasbility(nearestNode, newNode);
     if(isFeasible){
         newNode.prevNodeid = nearestNode.id;
-        if(type==0){newNode.id = forwrdTree.size();}
-        else{newNode.id = backwrdTree.size();}
+        if(cluster_id==0){newNode.id = forwardTree.size();}
+        else{newNode.id = backwardTree.size();}
         return newNode;
     }else{
         newNode.id = -1;
@@ -168,7 +175,14 @@ bool bi_rrtPlanner::checkReachGoal()
     double distance;
     bool result = true;
     for( size_t j=0;j<JOINTNUM;++j ){
-        if( abs(lastFrdNode.jointAngles[j] -lastBackNode.jointAngles[j]) >this->goalToleranceVec[j] ){
+        if(lastFrdNode.jointAngles.size() != JOINTNUM || lastBackNode.jointAngles.size() != JOINTNUM){
+            cout << "The joint numbers which is:" << lastFrdNode.jointAngles.size() << " should be: " << JOINTNUM << endl;
+            result = false;
+            break;
+        }
+        int diff = abs(lastFrdNode.jointAngles[j] -lastBackNode.jointAngles[j]);
+        cout << "The " << j << "th joint difference is: " << diff << endl;
+        if( diff > this->goalToleranceVec[j] ){
             result = false;
             break;
         }
@@ -183,11 +197,11 @@ void bi_rrtPlanner::findPath()
     backNode = this->lastBackNode;
     while(backNode.prevNodeid != -1){
         this->path.push_back(backNode);
-        backNode = this->backwrdTree[backNode.prevNodeid];
+        backNode = this->backwardTree[backNode.prevNodeid];
     }
     while(forNode.prevNodeid != -1){
         this->path.push_back(forNode);
-        forNode = this->forwrdTree[forNode.prevNodeid];
+        forNode = this->forwardTree[forNode.prevNodeid];
     }
 }
 
@@ -201,7 +215,7 @@ void bi_rrtPlanner::drawNewNode(node newNode)
         geometry_msgs::Point newPoint;
         geometry_msgs::Point prevPoint;
         calcNodePose(newNode, &newPoint);
-        calcNodePose(forwrdTree[newNode.prevNodeid], &prevPoint);
+        calcNodePose(forwardTree[newNode.prevNodeid], &prevPoint);
 
         points.points.push_back(newPoint);
         line_list.points.push_back(newPoint);
@@ -216,7 +230,7 @@ void bi_rrtPlanner::drawNewNode(node newNode)
         geometry_msgs::Point newPoint;
         geometry_msgs::Point prevPoint;
         calcNodePose(newNode, &newPoint);
-        calcNodePose(backwrdTree[newNode.prevNodeid], &prevPoint);
+        calcNodePose(backwardTree[newNode.prevNodeid], &prevPoint);
 
         points_bck.points.push_back(newPoint);
         line_list_bck.points.push_back(newPoint);
@@ -249,9 +263,9 @@ void bi_rrtPlanner::drawPlan()
             cout << "Entering next path" << endl;
         }
         if(curNode.cluster_id==0){
-            prevNode = forwrdTree[curNode.prevNodeid];
+            prevNode = forwardTree[curNode.prevNodeid];
         }else if(curNode.cluster_id==1){
-            prevNode = backwrdTree[curNode.prevNodeid];
+            prevNode = backwardTree[curNode.prevNodeid];
         }
         
         geometry_msgs::Point pointPose;

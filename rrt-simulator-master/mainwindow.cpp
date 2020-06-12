@@ -39,13 +39,15 @@ void MainWindow::on_startButton_clicked()
     }
 
     // Following code are used for testing algorithm efficiency
-    this->isObsRandom = false;
+    this->isObsRandom = true;
     generateObstacles();
     auto start = high_resolution_clock::now();
     auto stop = high_resolution_clock::now();
 
     // RRT Algorithm main loop
     // 1->original RRT, 2->seperate and link RRT, 3->rrtMult
+    // 4->bi-RRT,       5->RRT-Connect,         6->RRTMult + Connect,
+    // 7->RRTMultAdvance (several simplePath and choose the best one)
     int rrtType = 7;
     bool success;
     if(rrtType==1){
