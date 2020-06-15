@@ -48,12 +48,11 @@ int main(int argc, char** argv)
     // MAIN LOOP
     ROS_INFO("Currently running moveit planning");
     while(ros::ok()){
-        // Refresh the obstacles for next plan
-        // planning_scene_monitor_->getPlanningScene()->removeAllCollisionObjects();
-        obs_adder.add_obstacles();
-
-        // obs_adder.add_obstacles();
         visual_tools.prompt("Press 'next' to plan a path");
+        // Refresh the obstacles for next plan
+        // obs_adder.add_obstacles();
+        // obs_adder.generateFixedObs();
+        obs_adder.generateRandomObs();
 
         // Listen to tf broadcaster and set the transform as the move_group target
         tf::StampedTransform transform = getTargetTrans();

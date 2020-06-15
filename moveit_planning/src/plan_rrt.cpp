@@ -21,7 +21,7 @@ using namespace std;
 
 int getrrtType(int argc, char** argv)
 {
-    int rrtTypeResult = 2;
+    int rrtTypeResult = 3;
     for(int i=1;i<argc;++i){
         string paramName = argv[i];
         string paramValue = argv[++i];
@@ -78,11 +78,12 @@ int main(int argc, char** argv)
     // MAIN LOOP
     ROS_INFO("Currently running RRT planning");
     while(ros::ok()){
+        visual_tools.prompt("Press 'next' to plan a path");
         // Refresh the obstacles for next plan
         obs_adder.add_obstacles();
+        // obs_adder.generateFixedObs();
+        obs_adder.generateRandomObs();
         visual_tools.deleteAllMarkers();
-
-        visual_tools.prompt("Press 'next' to plan a path");
 
         // Listen to tf broadcaster and set the transform as the move_group target
         tf::StampedTransform transform = getTargetTrans();
@@ -98,33 +99,44 @@ int main(int argc, char** argv)
             cout << "The translations are: " << target_pose.position.x << " " << target_pose.position.y << " " << target_pose.position.z << endl;        
 
             vector<double> jointPosition{-0.170868, 0.592920, 0.298936, -0.000792, 0.042167, 0};
+            bool isGoalBlocked;
             if(rrtType==0){
                 // rrt_planner.setGoalNodeFromPose(target_pose);
                 rrt_planner.setGoalNode(jointPosition);
                 rrt_planner.setInitialNode(move_group.getCurrentJointValues());
+                isGoalBlocked = !rrt_planner.checkFeasbility(rrt_planner.goalNodes[0]);
             }else if(rrtType==1){
                 // bi_rrt_planner.setGoalNodeFromPose(target_pose);
                 bi_rrt_planner.setGoalNode(jointPosition);
                 bi_rrt_planner.setInitialNode(move_group.getCurrentJointValues());
+                isGoalBlocked = !bi_rrt_planner.checkFeasbility(bi_rrt_planner.goalNodes[0]);
             }else if(rrtType==2){
                 // rrt_connect_planner.setGoalNodeFromPose(target_pose);
                 rrt_connect_planner.setGoalNode(jointPosition);
                 rrt_connect_planner.setInitialNode(move_group.getCurrentJointValues());
+                isGoalBlocked = !rrt_connect_planner.checkFeasbility(rrt_connect_planner.goalNodes[0]);
             }else if(rrtType==3){
                 // sep_rrt_planner.setGoalNodeFromPose(target_pose);
                 sep_rrt_planner.setGoalNode(jointPosition);
                 sep_rrt_planner.setInitialNode(move_group.getCurrentJointValues());
+                isGoalBlocked = !sep_rrt_planner.checkFeasbility(sep_rrt_planner.goalNodes[0]);
             }
-
-            clock_t start, finish;
-            start = clock();
-            bool success;
-            if(rrtType==0){success = rrt_planner.plan();}
-            else if(rrtType==1){success = bi_rrt_planner.plan();}     
-            else if(rrtType==2){success = rrt_connect_planner.plan();}
-            else if(rrtType==3){success = sep_rrt_planner.plan();}       
-            finish = clock();
-            double time = (double)(finish-start)/CLOCKS_PER_SEC;
+            
+            bool success = false;
+            double time;
+            if(isGoalBlocked){
+                ROS_WARN("The goal is blocked, no availble path could be found");
+            }else{
+                ROS_INFO("The goal is not in collision, start planning");
+                clock_t start, finish;
+                start = clock();
+                if(rrtType==0){success = rrt_planner.plan();}
+                else if(rrtType==1){success = bi_rrt_planner.plan();}     
+                else if(rrtType==2){success = rrt_connect_planner.plan();}
+                else if(rrtType==3){success = sep_rrt_planner.plan();}       
+                finish = clock();
+                time = (double)(finish-start)/CLOCKS_PER_SEC;
+            }
 
             if(success){
                 moveit::planning_interface::MoveGroupInterface::Plan my_plan;

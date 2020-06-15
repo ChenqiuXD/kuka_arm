@@ -295,4 +295,3 @@ target_link_libraries(plan_rrt
   rrtConnectPlanner
   ${catkin_LIBRARIES}
 )
-

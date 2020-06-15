@@ -47,6 +47,7 @@ public:
     double calcDist(node a, node b);
     node extend(int id, node randNode);
     bool checkReachGoal(node newNode);
+    bool checkFeasbility(node);
     bool checkFeasbility(node nearestNode, node newNode);
     void findPath();
     bool plan();

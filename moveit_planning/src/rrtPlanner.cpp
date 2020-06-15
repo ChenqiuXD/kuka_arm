@@ -161,6 +161,43 @@ bool rrtPlanner::checkReachGoal(node newNode)
     return result;
 }
 
+bool rrtPlanner::checkFeasbility(node a)
+{
+    // Check angle max and min
+    for(int i=0;i<JOINTNUM;++i){
+        if(a.jointAngles[i]>jointUpperLimits[i] || a.jointAngles[i]<jointLowerLimits[i]){
+            cout << "The angle of " << i << "th joint is out of limit." << endl;
+            return false;
+        }
+    }
+
+    // Check collision
+    collision_detection::CollisionRequest collision_request;
+    collision_detection::CollisionResult collision_result;
+    collision_result.clear();
+
+    const std::vector<std::string>& joint_names = jointModelGroup->getVariableNames();
+    std::vector<double> joint_values;
+    degreeToRadian(a.jointAngles, &joint_values);
+
+    const std::string PLANNING_SCENE_SERVICE = "get_planning_scene";   
+    planningSceneMonitor_->requestPlanningSceneState(PLANNING_SCENE_SERVICE);
+    planning_scene_monitor::LockedPlanningSceneRW planningSceneRW(planningSceneMonitor_);
+    planningSceneRW->getCurrentStateNonConst().update();
+
+    bool isCollision = false;
+    robot_state::RobotState stateInBetween(kinematicModel);
+    stateInBetween.setVariablePositions(joint_names, joint_values);
+    planningSceneRW->checkCollision(collision_request, collision_result, stateInBetween);
+    if(collision_result.collision){
+        isCollision = true;
+        cout << "The node encounters a collision, node abandoned" << endl;
+    }else{
+        cout << "This node is not in collision area" << endl;
+    }
+    return !isCollision;    
+}
+
 bool rrtPlanner::checkFeasbility(node nearestNode, node newNode)
 {
     // Check angle max and min

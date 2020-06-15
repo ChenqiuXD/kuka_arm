@@ -27,12 +27,21 @@ public:
     moveit_msgs::CollisionObject add_wooden_box();
     moveit_msgs::CollisionObject add_target();
     moveit_msgs::CollisionObject add_test_obstacles();
+    void generateRandomObs();
+    void generateFixedObs();
+    geometry_msgs::Pose getRandomPose();
 
     map<string, geometry_msgs::Pose>obs_poses;
     vector<string> obs_names;
     ros::NodeHandle& nh;
     ros::Subscriber link_states_sub;
     ros::Publisher obstacle_pub;
+
+    // Parameter used in generating random obstacles
+    int MIN_BORDER_X = 5, MIN_BORDER_Y = -3, MIN_BORDER_Z = 5;
+    int MAX_BORDER_X = 10, MAX_BORDER_Y = 3, MAX_BORDER_Z = 7;
+    int MIN_SIZE = 3, MAX_SIZE = 6; // centimeters, should divided by 100 in meter
+    int OBJECT_NUM = 6;
 };
 
 #endif

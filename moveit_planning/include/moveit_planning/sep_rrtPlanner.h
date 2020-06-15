@@ -13,22 +13,31 @@ class sep_rrtPlanner : public rrtPlanner
         bool plan();
         void initialize();
         void getSimplePath();
-        void seperateSimplePath();
+        void seperatePaths();
+        void seperateSimplePath(vector<node> &path);
+        void addInTree(int nodeGroupid);
         void checkConnection(node newNode, int *groupid, int *nodeid);
         void connectToGroup(node *newNode, int groupid, int nodeid);
+        void findPath();
+        bool chechReachGoal(int groupid);
 
         // utils
         double getDistStartToEnd();
         void drawSimplePath();
+        void drawSimplePathContinuity();
+        void drawPlan();
         void initVisual();
 
         int groupCount;
-        vector<node> simplePath;
+        vector< vector<node> > simplePaths;
         vector< vector<node> > nodeGroups;
-        vector<node> path;
+        vector<int> goalGroupCount;
+        vector<int> startGroupid;
 
         visualization_msgs::Marker points_simple;
         visualization_msgs::Marker line_list_simple;
+
+        int EXPAND_RATE = 8;       // Used when generating 
 };
 
 #endif

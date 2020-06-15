@@ -41,10 +41,6 @@ bool rrtConnectPlanner::plan()
 
         cout << "Current node forwardTree count: " << forwardTree.size() << " backwardTree: " << backwardTree.size() << endl;
         count += 1;
-
-        if(count>=2000){
-            cout << "Return 1000 iteration" << endl;
-        }
     }
     if(this->success){
         findPath();

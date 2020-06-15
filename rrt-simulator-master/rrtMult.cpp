@@ -117,7 +117,9 @@ void RRTMult::seperateSimplePath()
         }else{
         }
     }
-    nodeGroups.push_back(group);
+    if(group.size()){
+        nodeGroups.push_back(group);
+    }
 }
 
 /**

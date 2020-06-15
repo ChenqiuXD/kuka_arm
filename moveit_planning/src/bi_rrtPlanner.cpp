@@ -181,7 +181,7 @@ bool bi_rrtPlanner::checkReachGoal()
             break;
         }
         int diff = abs(lastFrdNode.jointAngles[j] -lastBackNode.jointAngles[j]);
-        cout << "The " << j << "th joint difference is: " << diff << endl;
+        // cout << "The " << j << "th joint difference is: " << diff << endl;
         if( diff > this->goalToleranceVec[j] ){
             result = false;
             break;

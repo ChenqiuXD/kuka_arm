@@ -7,6 +7,7 @@
 #include <gazebo_msgs/LinkStates.h>
 #include <geometry_msgs/Pose.h>
 #include <typeinfo>
+#include <random>
 
 #include "obstacle_adder.h"
 
@@ -66,6 +67,76 @@ void Obstacle_Adder::add_obstacles()
     this->obstacle_pub.publish(planning_scene_msg);
     ros::WallDuration sleep_t(0.5);
     sleep_t.sleep();
+}
+
+void Obstacle_Adder::generateRandomObs()
+{
+    std::vector<moveit_msgs::CollisionObject> collision_objects;
+    srand(time(NULL));
+    random_device rd;
+    ros::WallDuration sleep_t(0.5);
+    for(int i=0;i<OBJECT_NUM;++i){
+        moveit_msgs::CollisionObject collision_object;
+        collision_object.header.frame_id = "/world";
+        collision_object.header.stamp = ros::Time::now();
+        collision_object.operation = collision_object.ADD;
+        collision_object.id = i;
+    
+        shape_msgs::SolidPrimitive primitive;
+        primitive.type = primitive.BOX;
+        primitive.dimensions.resize(3);
+        double size = rd() % (MAX_SIZE-MIN_SIZE) + MIN_SIZE;
+        size /= 100;    // change from centimeter into meter
+        primitive.dimensions[0] = size;
+        primitive.dimensions[1] = size;
+        primitive.dimensions[2] = 0.03;
+
+        collision_object.primitives.push_back(primitive);
+        geometry_msgs::Pose p = getRandomPose();
+        collision_object.primitive_poses.push_back(p);
+
+        collision_objects.push_back(collision_object);
+        sleep_t.sleep();
+    }
+
+    moveit_msgs::PlanningScene planning_scene_msg;
+    planning_scene_msg.name = "motion_planning_scene";
+    planning_scene_msg.world.collision_objects = collision_objects;
+    planning_scene_msg.is_diff = true;
+    this->obstacle_pub.publish(planning_scene_msg);
+    sleep_t.sleep();
+
+}
+
+void Obstacle_Adder::generateFixedObs()
+{
+    std::vector<moveit_msgs::CollisionObject> collision_objects;
+    moveit_msgs::CollisionObject collision_object;
+    collision_object.header.frame_id = "/world";
+    collision_object.header.stamp = ros::Time::now();
+    collision_object.operation = collision_object.ADD;
+    collision_object.id = "area";
+
+    shape_msgs::SolidPrimitive primitive;
+    primitive.type = primitive.BOX;
+    primitive.dimensions.resize(3);
+    primitive.dimensions[0] = (MAX_BORDER_X - MIN_BORDER_X)/10.0;
+    primitive.dimensions[1] = (MAX_BORDER_Y - MIN_BORDER_Y)/10.0;
+    primitive.dimensions[2] = (MAX_BORDER_Z - MIN_BORDER_Z)/10.0;
+
+    collision_object.primitives.push_back(primitive);
+    geometry_msgs::Pose p;
+    p.position.x = ((MAX_BORDER_X-MIN_BORDER_X)/2 + MIN_BORDER_X)/10.0;
+    p.position.y = ((MAX_BORDER_Y-MIN_BORDER_Y)/2 + MIN_BORDER_Y)/10.0;
+    p.position.z = ((MAX_BORDER_Z-MIN_BORDER_Z)/2 + MIN_BORDER_Z)/10.0;
+    collision_object.primitive_poses.push_back(p);
+
+    collision_objects.push_back(collision_object);
+    moveit_msgs::PlanningScene planning_scene_msg;
+    planning_scene_msg.name = "motion_planning_scene";
+    planning_scene_msg.world.collision_objects = collision_objects;
+    planning_scene_msg.is_diff = true;
+    this->obstacle_pub.publish(planning_scene_msg);  
 }
 
 moveit_msgs::CollisionObject Obstacle_Adder::add_wooden_box()
@@ -162,16 +233,53 @@ moveit_msgs::CollisionObject Obstacle_Adder::add_test_obstacles()
     shape_msgs::SolidPrimitive primitive;
     primitive.type = primitive.BOX;
     primitive.dimensions.resize(3);
-    primitive.dimensions[0] = 0.20;
-    primitive.dimensions[1] = 0.20;
+    primitive.dimensions[0] = 0.10;
+    primitive.dimensions[1] = 0.10;
     primitive.dimensions[2] = 0.03;
-
     collision_object.primitives.push_back(primitive);
+
+    primitive.dimensions[0] = 0.10;
+    primitive.dimensions[1] = 0.10;
+    primitive.dimensions[2] = 0.03;
+    collision_object.primitives.push_back(primitive);
+    
+    // primitive.dimensions[0] = 0.06;
+    // primitive.dimensions[1] = 0.06;
+    // primitive.dimensions[2] = 0.03;
+    // collision_object.primitives.push_back(primitive);
+
     geometry_msgs::Pose pose;
     pose.position.x = 0.60;
-    pose.position.y = 0.0;
+    pose.position.y = -0.04;
     pose.position.z = 0.7;
     collision_object.primitive_poses.push_back(pose);
 
+    pose.position.x = 0.60;
+    pose.position.y = 0.2;
+    pose.position.z = 0.6;
+    collision_object.primitive_poses.push_back(pose);
+
+    // pose.position.x = 0.45;
+    // pose.position.y = 0.1;
+    // pose.position.z = 0.5;
+    // collision_object.primitive_poses.push_back(pose);
+
     return collision_object;
+}
+
+geometry_msgs::Pose Obstacle_Adder::getRandomPose()
+{
+    srand(time(NULL));
+    random_device rd;
+    geometry_msgs::Pose p;
+    p.position.x = rd() % (MAX_BORDER_X-MIN_BORDER_X);
+    p.position.y = rd() % (MAX_BORDER_Y-MIN_BORDER_Y);
+    p.position.z = rd() % (MAX_BORDER_Z-MIN_BORDER_Z);
+    p.position.x += MIN_BORDER_X;
+    p.position.y += MIN_BORDER_Y;
+    p.position.z += MIN_BORDER_Z;
+    p.position.x /= 10;
+    p.position.y /= 10;
+    p.position.z /= 10;
+    return p;
 }

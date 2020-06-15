@@ -182,7 +182,7 @@ void rrtPlanner::drawNewNode(node newNode)
 
     markerPub.publish(points);
     markerPub.publish(line_list);
-    ros::WallDuration sleep_t(1);
+    ros::WallDuration sleep_t(0.5);
     if(this->enableVisual == VISUAL_TYPES::VISUAL_STEP){
         sleep_t.sleep();
     }   
@@ -231,20 +231,7 @@ void rrtPlanner::calcNodePose(node newNode, geometry_msgs::Point *nodePose)
 
 void rrtPlanner::generatePlanMsg(double time, moveit::planning_interface::MoveGroupInterface::Plan* my_plan)
 {
-    // my_plan->planning_time_ = time;    
-    // moveit_msgs::RobotState robot_state;
-    // sensor_msgs::JointState joint_state;
-
-    // std_msgs::Header header;
-    // header.stamp = ros::Time::now();
-    // header.frame_id = "/world";
-    // joint_state.header = header;
-
-    // vector<string> s;
-    // nh.getParam("/joint_names", s);
-    // joint_state.name = s;
-
-    // TODO
+    // abandoned
     ;
 }
 
