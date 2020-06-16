@@ -314,5 +314,6 @@ target_link_libraries(plan_rrt
   sep_rrtPlanner
   rrtConnectPlanner
   bi_rrtMultPlanner
+  rrtMultConnect
   ${catkin_LIBRARIES}
 )

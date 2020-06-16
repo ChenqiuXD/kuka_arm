@@ -19,7 +19,7 @@ bi_rrtMultPlanner::bi_rrtMultPlanner(ros::NodeHandle& nh,
     readJntLimits(); 
 }
 
-bool bi_rrtMultPlanner::planPath()
+bool bi_rrtMultPlanner::plan()
 {
     initialize();
 

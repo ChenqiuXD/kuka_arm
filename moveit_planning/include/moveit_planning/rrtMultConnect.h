@@ -11,11 +11,22 @@ class rrtMultConnectPlanner : public rrtConnectPlanner
                               planning_scene_monitor::PlanningSceneMonitorPtr planning_scene_monitor_);
         
         // Core functions
-        bool planPath();
+        bool plan();
+        void getSimplePath();
+        void seperateSimplePaths();
+        void seperatePath(vector<node> &path);
+        void addToTree();
 
         // util functions
+        double getDistStartToEnd();
 
         // Member
+        int groupCount;
+        vector< vector<node> > simplePaths;
+        vector< vector<node> > nodeGroups;
+        vector<int> goalGroupCount;
+        vector<int> startGroupid;
+        int EXPAND_RATE = 8;       // Used when generating 
         int MAX_ITER_CONNECT = 10;
 };
 

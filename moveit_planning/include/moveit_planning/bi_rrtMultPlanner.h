@@ -11,7 +11,7 @@ class bi_rrtMultPlanner : public bi_rrtPlanner
                           planning_scene_monitor::PlanningSceneMonitorPtr planning_scene_monitor_);
         
         // core function
-        bool planPath();
+        bool plan();
         void getSimplePath();
         void seperateSimplePaths();
         void seperatePath(vector<node> &path);
