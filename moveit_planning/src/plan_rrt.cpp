@@ -16,12 +16,13 @@
 #include "bi_rrtPlanner.h"
 #include "rrtConnectPlanner.h"
 #include "sep_rrtPlanner.h"
+#include "bi_rrtMultPlanner.h"
 
 using namespace std;
 
 int getrrtType(int argc, char** argv)
 {
-    int rrtTypeResult = 3;
+    int rrtTypeResult = 4;
     for(int i=1;i<argc;++i){
         string paramName = argv[i];
         string paramValue = argv[++i];
@@ -30,6 +31,7 @@ int getrrtType(int argc, char** argv)
             else if(paramValue=="1"){rrtTypeResult = 1;}    // Bi-directional RRT
             else if(paramValue=="2"){rrtTypeResult = 2;}    // RRT-Connect
             else if(paramValue=="3"){rrtTypeResult = 3;}    // Seperate RRT
+            else if(paramValue=="4"){rrtTypeResult = 4;}    // Bi-RRTMult
             else{ROS_ERROR("Invalid rrt type, recheck your command input");}
         }
     }
@@ -67,6 +69,8 @@ int main(int argc, char** argv)
     rrt_connect_planner.getParamFromCommandline(argc, argv);
     sep_rrtPlanner sep_rrt_planner = sep_rrtPlanner(nh, kinematic_model, planning_scene_monitor_);
     sep_rrt_planner.getParamFromCommandline(argc, argv);
+    bi_rrtMultPlanner bi_rrt_mult_planner = bi_rrtMultPlanner(nh, kinematic_model, planning_scene_monitor_);
+    bi_rrt_mult_planner.getParamFromCommandline(argc, argv);
 
     // Start moveit visual tools
     namespace rvt = rviz_visual_tools;
@@ -120,6 +124,10 @@ int main(int argc, char** argv)
                 sep_rrt_planner.setGoalNode(jointPosition);
                 sep_rrt_planner.setInitialNode(move_group.getCurrentJointValues());
                 isGoalBlocked = !sep_rrt_planner.checkFeasbility(sep_rrt_planner.goalNodes[0]);
+            }else if(rrtType==4){
+                bi_rrt_mult_planner.setGoalNode(jointPosition);
+                bi_rrt_mult_planner.setInitialNode(move_group.getCurrentJointValues());
+                isGoalBlocked = !bi_rrt_mult_planner.checkFeasbility(bi_rrt_mult_planner.goalNodes[0]);
             }
             
             bool success = false;
@@ -133,7 +141,8 @@ int main(int argc, char** argv)
                 if(rrtType==0){success = rrt_planner.plan();}
                 else if(rrtType==1){success = bi_rrt_planner.plan();}     
                 else if(rrtType==2){success = rrt_connect_planner.plan();}
-                else if(rrtType==3){success = sep_rrt_planner.plan();}       
+                else if(rrtType==3){success = sep_rrt_planner.plan();}
+                else if(rrtType==4){success = bi_rrt_mult_planner.planPath();}       
                 finish = clock();
                 time = (double)(finish-start)/CLOCKS_PER_SEC;
             }

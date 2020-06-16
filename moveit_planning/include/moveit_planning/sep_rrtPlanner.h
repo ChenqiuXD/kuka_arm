@@ -26,7 +26,7 @@ class sep_rrtPlanner : public rrtPlanner
         void drawSimplePath();
         void drawSimplePathContinuity();
         void drawPlan();
-        void initVisual();
+        void initSimplePathVisual();
 
         int groupCount;
         vector< vector<node> > simplePaths;

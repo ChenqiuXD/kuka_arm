@@ -5,7 +5,6 @@ bi_rrtPlanner::bi_rrtPlanner(ros::NodeHandle& nh,
                              planning_scene_monitor::PlanningSceneMonitorPtr planning_scene_monitor_)
                              : rrtPlanner(nh, kinematic_model, planning_scene_monitor_)
 {
-    // rrtPlanner(nh, kinematic_model, planning_scene_monitor_);
     this->kinematicModel = kinematic_model;
     robot_state::RobotStatePtr kinematic_state(new robot_state::RobotState(kinematic_model));
     this->kinematicState = kinematic_state;

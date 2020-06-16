@@ -34,14 +34,17 @@ bool sep_rrtPlanner::plan()
         if(goalGroupCount[i]-goalGroupCount[i-1]==1){
             cout << "Successfully connected in first step by connecting " << i << " and " << i+1 << " nodeGroups" << endl;
             this->success = true;
+            addInTree(goalGroupCount[i]-1);
             break;
         }
     }
-    for(size_t i=startGroupid.size()-1;i>0;--i){      // Push all the start groups into the rrt search tree
-        addInTree(startGroupid[i]);
-        for(size_t j=0;j<goalGroupCount.size();++j){
-            if(goalGroupCount[j]>=startGroupid[i]){
-                goalGroupCount[j] -= 1;
+    if(!this->success){
+        for(size_t i=startGroupid.size()-1;i>0;--i){      // Push all the start groups into the rrt search tree
+            addInTree(startGroupid[i]);
+            for(size_t j=0;j<goalGroupCount.size();++j){
+                if(goalGroupCount[j]>=startGroupid[i]){
+                    goalGroupCount[j] -= 1;
+                }
             }
         }
     }
@@ -83,9 +86,10 @@ void sep_rrtPlanner::initialize()
     this->nodeGroups.clear();
     this->path.clear();
     this->goalGroupCount.clear();
+    this->startGroupid.clear();
     this->success = false;    
 
-    this->initVisual();
+    this->initSimplePathVisual();
     this->initrrtVisual();
     this->initPathVisual();
 }
@@ -332,7 +336,7 @@ void sep_rrtPlanner::drawSimplePath()
     markerPub.publish(line_list_simple);
 }
 
-void sep_rrtPlanner::initVisual()
+void sep_rrtPlanner::initSimplePathVisual()
 {
     points_simple.points.clear();
     line_list_simple.points.clear();

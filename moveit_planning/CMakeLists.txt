@@ -282,6 +282,26 @@ target_link_libraries(rrtConnectPlanner
   ${catkin_LIBRARIES}
 )
 
+add_library(bi_rrtMultPlanner
+  include/moveit_planning/bi_rrtMultPlanner.h
+  src/bi_rrtMultPlanner.cpp
+)
+add_dependencies(bi_rrtMultPlanner ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
+target_link_libraries(bi_rrtMultPlanner
+  bi_rrtPlanner
+  ${catkin_LIBRARIES}
+)
+
+add_library(rrtMultConnect
+  src/rrtMultConnect.cpp
+  include/moveit_planning/rrtMultConnect.h
+)
+add_dependencies(rrtMultConnect ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
+target_link_libraries(rrtMultConnect
+  rrtConnectPlanner
+  ${catkin_LIBRARIES}
+)
+
 add_executable(plan_rrt
   src/plan_rrt.cpp
 )
@@ -293,5 +313,6 @@ target_link_libraries(plan_rrt
   bi_rrtPlanner
   sep_rrtPlanner
   rrtConnectPlanner
+  bi_rrtMultPlanner
   ${catkin_LIBRARIES}
 )

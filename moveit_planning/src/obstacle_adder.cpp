@@ -233,8 +233,8 @@ moveit_msgs::CollisionObject Obstacle_Adder::add_test_obstacles()
     shape_msgs::SolidPrimitive primitive;
     primitive.type = primitive.BOX;
     primitive.dimensions.resize(3);
-    primitive.dimensions[0] = 0.10;
-    primitive.dimensions[1] = 0.10;
+    primitive.dimensions[0] = 0.12;
+    primitive.dimensions[1] = 0.12;
     primitive.dimensions[2] = 0.03;
     collision_object.primitives.push_back(primitive);
 
