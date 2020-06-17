@@ -48,7 +48,7 @@ void MainWindow::on_startButton_clicked()
     // 1->original RRT, 2->seperate and link RRT, 3->rrtMult
     // 4->bi-RRT,       5->RRT-Connect,         6->RRTMult + Connect,
     // 7->RRTMultAdvance (several simplePath and choose the best one)
-    int rrtType = 7;
+    int rrtType = 5;
     bool success;
     if(rrtType==1){
         success = rrt->plan();

@@ -23,7 +23,7 @@ using namespace std;
 
 int getrrtType(int argc, char** argv)
 {
-    int rrtTypeResult = 5;
+    int rrtTypeResult = 3;
     for(int i=1;i<argc;++i){
         string paramName = argv[i];
         string paramValue = argv[++i];
@@ -135,7 +135,7 @@ int main(int argc, char** argv)
             }else if(rrtType==5){
                 rrt_mult_connect_planner.setGoalNode(jointPosition);
                 rrt_mult_connect_planner.setInitialNode(move_group.getCurrentJointValues());
-                isGoalBlocked = !rrt_mult_connect_planner.checkFeasbility(bi_rrt_mult_planner.goalNodes[0]);
+                isGoalBlocked = !rrt_mult_connect_planner.checkFeasbility(rrt_mult_connect_planner.goalNodes[0]);
             }
             
             bool success = false;

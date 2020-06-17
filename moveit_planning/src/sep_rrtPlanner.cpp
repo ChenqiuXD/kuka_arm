@@ -23,13 +23,9 @@ bool sep_rrtPlanner::plan()
 {
     initialize();
     getSimplePath();
-    
-    // For display debugging utils only
-    // drawSimplePathContinuity();
-    // return false;
-
     seperatePaths();
     drawSimplePath();
+
     for(size_t i=goalGroupCount.size()-1;i>0;--i){  // Check whether some simple path can directly connect start and end pos
         if(goalGroupCount[i]-goalGroupCount[i-1]==1){
             cout << "Successfully connected in first step by connecting " << i << " and " << i+1 << " nodeGroups" << endl;
