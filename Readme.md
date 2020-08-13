@@ -17,7 +17,7 @@ src
 ├────── Auto generated moveit_config_package by Moveit! using the urdf file in kuka_kr6_description.  
 ├────── Check for the tutorials about connecting rviz and gazebo for detailed description  
 ├── moveit_planning  
-├────── Motion planning functions. Method list: 1 Moveit built-in functions; 2 rrt; 3 new rrt(unfinished)  
+├────── Motion planning functions. Method list: 1 Moveit built-in functions; 2 rrt; 3 new rrt  
 ├── rrt-simulator-master  
 └────── A Qt-based rrt simulation forked from https://github.com/sourishg/rrt-simulator with rrtMult newly written algorithm  
 
@@ -94,7 +94,7 @@ Here 'rrtType': 0 -> RRT, 1 -> bi-directional RRT, 2 -> RRT-Connect
 All the planning codes are in the moveit_planning package.  
 
 | Names | methods |  
--|:-:|-:
+-|:-:|-:  
 |rrtPlanner|Traditional RRT planner|  
 |bi_rrtPlanner|Bi-directional RRT planner|   
 |rrtConnectPlanner|RRT-Connect|  
